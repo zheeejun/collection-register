@@ -2,19 +2,14 @@
 /**
  * 館藏登記：書名、館藏地點、序號。可新增、複製、刪除、拖曳排序。
  * 資料自動存在瀏覽器的 localStorage（STORAGE_KEY）。
- * 拖曳使用 vuedraggable（SortableJS），只有左側握把可以拖。
+ * 這裡保存資料與操作邏輯，畫面在 components/ 底下。
  */
 import { computed, nextTick, ref, watch } from 'vue'
-import draggable from 'vuedraggable'
-import LocationInput from './components/LocationInput.vue'
-
-interface Row {
-  id: string
-  title: string // 書名
-  loc: string // 館藏地點
-  sn: string // 序號
-}
-type Field = 'title' | 'loc' | 'sn'
+import AppToast from './components/AppToast.vue'
+import EmptyState from './components/EmptyState.vue'
+import RegisterList from './components/RegisterList.vue'
+import RegisterToolbar from './components/RegisterToolbar.vue'
+import type { Field, Row } from './types'
 
 const STORAGE_KEY = 'collection-register-vue-v1'
 const MAX_ROWS = 1500
@@ -189,17 +184,7 @@ async function copyAll() {
   showToast(`已複製 ${lines.length} 列，可直接貼到 Excel`)
 }
 
-const clearArmed = ref(false)
-let armTimer = 0
 function clearAll() {
-  if (!rows.value.length) return
-  if (!clearArmed.value) {
-    clearArmed.value = true
-    armTimer = window.setTimeout(() => (clearArmed.value = false), 4000)
-    return
-  }
-  clearTimeout(armTimer)
-  clearArmed.value = false
   const snap = snapshot()
   rows.value = []
   showToast(`已清空 ${snap.length} 列`, snap)
@@ -209,125 +194,29 @@ function clearAll() {
 <template>
   <main class="wrap">
     <header class="top">
-      <h1>館藏登記</h1>
+      <h1>Collection Register</h1>
       <p class="sub">{{ summary }}</p>
     </header>
 
-    <div class="bar">
-      <button type="button" class="btn primary" @click="addRow">＋ 新增一列</button>
-      <button type="button" class="btn" title="以 Tab 分隔（書名、館藏地點、序號），可直接貼到 Excel" @click="copyAll">複製全部</button>
-      <label class="opt"><input v-model="incSerial" type="checkbox" /> 複製列時，序號自動 +1</label>
-      <span class="spacer" />
-      <button type="button" class="btn quiet" :class="{ armed: clearArmed }" @click="clearAll">
-        {{ clearArmed ? '再按一次清空全部' : '全部清空' }}
-      </button>
-    </div>
+    <RegisterToolbar v-model:inc="incSerial" :empty="!rows.length" @add="addRow" @copy="copyAll" @clear="clearAll" />
 
-    <template v-if="rows.length">
-      <p class="hint">拖曳左側握把可調整順序，握把上按 ↑ ↓ 鍵也可以移動。資料會自動存在這個瀏覽器。</p>
-      <div class="cols-head" aria-hidden="true">
-        <span /><span>#</span><span>書名</span><span>館藏地點</span><span>序號</span><span />
-      </div>
-
-      <draggable v-model="rows" tag="ol" class="list" item-key="id" handle=".handle" :animation="150" ghost-class="ghost" chosen-class="chosen">
-        <template #item="{ element: row, index }">
-          <li class="row" :class="{ flash: row.id === flashId }">
-            <button
-              :id="`handle-${row.id}`"
-              type="button"
-              class="handle"
-              :aria-label="`拖曳排序：第 ${index + 1} 列`"
-              title="拖曳排序（也可按 ↑ ↓ 鍵）"
-              @keydown.up.prevent="moveRow(index, -1)"
-              @keydown.down.prevent="moveRow(index, 1)"
-            >
-              <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
-                <g fill="currentColor">
-                  <circle cx="7" cy="5" r="1.5" /><circle cx="13" cy="5" r="1.5" />
-                  <circle cx="7" cy="10" r="1.5" /><circle cx="13" cy="10" r="1.5" />
-                  <circle cx="7" cy="15" r="1.5" /><circle cx="13" cy="15" r="1.5" />
-                </g>
-              </svg>
-            </button>
-
-            <div class="idx">{{ String(index + 1).padStart(2, '0') }}</div>
-
-            <div class="f ttl">
-              <label class="lbl" :for="`title-${row.id}`">書名</label>
-              <input
-                :id="`title-${row.id}`"
-                v-model="row.title"
-                type="text"
-                autocomplete="off"
-                maxlength="300"
-                placeholder="例：書名"
-                :aria-label="`第 ${index + 1} 列 書名`"
-                @keydown.enter="onEnter($event, index, 'title')"
-              />
-            </div>
-
-            <div class="f loc">
-              <label class="lbl" :for="`loc-${row.id}`">館藏地點</label>
-              <LocationInput
-                v-model="row.loc"
-                :input-id="`loc-${row.id}`"
-                :options="locs"
-                placeholder="例：總館 3F 中文圖書區"
-                :aria-label="`第 ${index + 1} 列 館藏地點`"
-                @add="addLoc"
-                @remove="removeLoc"
-                @next="focusField(index, 'sn')"
-              />
-            </div>
-
-            <div class="f sn">
-              <label class="lbl" :for="`sn-${row.id}`">序號</label>
-              <input
-                :id="`sn-${row.id}`"
-                v-model="row.sn"
-                type="text"
-                autocomplete="off"
-                spellcheck="false"
-                maxlength="100"
-                placeholder="例：884.157 3460"
-                :aria-label="`第 ${index + 1} 列 序號`"
-                @keydown.enter="onEnter($event, index, 'sn')"
-              />
-            </div>
-
-            <div class="acts">
-              <button type="button" class="icon" :aria-label="`複製第 ${index + 1} 列`" title="複製這一列" @click="dupRow(index)">
-                <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="7" y="7" width="9" height="9" rx="1.5" />
-                  <path d="M13 7V5.5A1.5 1.5 0 0 0 11.5 4h-6A1.5 1.5 0 0 0 4 5.5v6A1.5 1.5 0 0 0 5.5 13H7" />
-                </svg>
-              </button>
-              <button type="button" class="icon del" :aria-label="`刪除第 ${index + 1} 列`" title="刪除這一列" @click="delRow(index)">
-                <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4.5 6h11M8 6V4.5h4V6M6 6l.6 9a1 1 0 0 0 1 .9h4.8a1 1 0 0 0 1-.9L14 6" />
-                </svg>
-              </button>
-            </div>
-          </li>
-        </template>
-      </draggable>
-    </template>
-
-    <div v-else class="empty">
-      <h2>還沒有館藏紀錄</h2>
-      <p>每一列記錄一本館藏的書名、館藏地點和序號。新增後可以複製、刪除，或拖曳調整順序。</p>
-      <button type="button" class="btn primary" @click="addRow">新增第一列</button>
-    </div>
+    <RegisterList
+      v-if="rows.length"
+      v-model="rows"
+      :locs="locs"
+      :flash-id="flashId"
+      @dup="dupRow"
+      @del="delRow"
+      @move="moveRow"
+      @enter="onEnter"
+      @next="focusField($event, 'sn')"
+      @add-loc="addLoc"
+      @remove-loc="removeLoc"
+    />
+    <EmptyState v-else @add="addRow" />
   </main>
 
-  <Transition name="toast">
-    <div v-if="toast" class="toast">
-      <div class="in" role="status">
-        <span>{{ toast.msg }}</span>
-        <button v-if="toast.undo" type="button" class="undo" @click="undo">復原</button>
-      </div>
-    </div>
-  </Transition>
+  <AppToast :msg="toast?.msg" :can-undo="!!toast?.undo" @undo="undo" />
 </template>
 
 <!-- 全域：字體、色彩（Tailwind teal）、基本元件。要換顏色改這裡的 --accent 系列即可 -->
@@ -423,14 +312,10 @@ input[type='text']:focus {
 
 <style scoped>
 .wrap {
-  /* 欄寬：握把 / 列號 / 書名 / 館藏地點 / 序號 / 操作鈕，要調整改這一行 */
-  --cols: 32px 44px minmax(0, 1.15fr) minmax(0, 1fr) minmax(140px, 190px) 84px;
   max-width: 1000px;
   margin: 0 auto;
   padding: 28px max(16px, env(safe-area-inset-right, 0px)) 120px max(16px, env(safe-area-inset-left, 0px));
 }
-
-/* 標題 */
 .top {
   display: flex;
   flex-wrap: wrap;
@@ -448,304 +333,5 @@ h1 {
   color: var(--muted);
   font-size: 14px;
   font-variant-numeric: tabular-nums;
-}
-
-/* 工具列 */
-.bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin: 20px 0 12px;
-}
-.spacer {
-  flex: 1 1 0;
-}
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 40px;
-  padding: 0 14px;
-  border: 1px solid var(--line-strong);
-  border-radius: 6px;
-  background: var(--surface);
-  color: var(--ink);
-  font: 500 14px var(--f-body);
-  cursor: pointer;
-}
-.btn:hover {
-  background: var(--field);
-  border-color: var(--muted);
-}
-.btn.primary {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
-}
-.btn.primary:hover {
-  background: var(--accent);
-  filter: brightness(1.1);
-}
-.btn.quiet {
-  border-color: transparent;
-  background: transparent;
-  color: var(--muted);
-}
-.btn.quiet:hover {
-  background: var(--surface);
-  color: var(--danger);
-}
-.btn.quiet.armed,
-.btn.quiet.armed:hover {
-  background: var(--danger);
-  color: var(--on-danger);
-}
-.opt {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--muted);
-  cursor: pointer;
-}
-.opt input {
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  accent-color: var(--accent);
-}
-.hint {
-  margin: 0 0 10px;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-/* 清單 */
-.list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 8px;
-}
-.cols-head,
-.row {
-  display: grid;
-  grid-template-columns: var(--cols);
-  align-items: center;
-  gap: 10px;
-}
-.cols-head {
-  padding: 0 13px 6px;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-.row {
-  padding: 10px 12px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-.row.flash {
-  animation: flash 1s ease-out;
-}
-@keyframes flash {
-  from {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-  }
-}
-/* 拖曳中的樣式（SortableJS 會加上這些 class） */
-.ghost {
-  opacity: 0.45;
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-.chosen {
-  border-color: var(--accent);
-  box-shadow: var(--shadow);
-}
-
-.handle {
-  width: 32px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--muted);
-  cursor: grab;
-  touch-action: none;
-  -webkit-touch-callout: none;
-  user-select: none;
-}
-.handle:hover {
-  background: var(--bg);
-  color: var(--ink);
-}
-.idx {
-  font: 13px/1.2 var(--f-mono);
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.f {
-  display: block;
-  min-width: 0;
-}
-.lbl {
-  display: none;
-  margin-bottom: 4px;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-}
-/* 序號欄：像索書號標籤 */
-.sn input {
-  font-family: var(--f-mono);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  background: var(--accent-soft);
-  border-color: var(--accent-line);
-}
-.acts {
-  display: flex;
-  gap: 2px;
-}
-.icon {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-}
-.icon:hover {
-  background: var(--bg);
-  color: var(--ink);
-}
-.icon.del:hover {
-  background: var(--danger-soft);
-  color: var(--danger);
-}
-
-.empty {
-  display: grid;
-  justify-items: start;
-  gap: 12px;
-  padding: 28px 20px;
-  border: 1px dashed var(--line-strong);
-  border-radius: 8px;
-  color: var(--muted);
-}
-.empty h2 {
-  margin: 0;
-  font: 700 17px var(--f-body);
-  color: var(--ink);
-}
-.empty p {
-  margin: 0;
-  max-width: 46ch;
-}
-
-/* 提示（含復原） */
-.toast {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 40;
-  display: flex;
-  justify-content: center;
-  padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
-  pointer-events: none;
-}
-.toast .in {
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  max-width: 560px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: var(--ink);
-  color: var(--bg);
-  box-shadow: var(--shadow);
-  font-size: 14px;
-}
-.toast .undo {
-  padding: 4px 2px;
-  border: 0;
-  background: transparent;
-  color: var(--toast-link);
-  font: 700 14px var(--f-body);
-  text-decoration: underline;
-  cursor: pointer;
-}
-.toast-enter-active,
-.toast-leave-active {
-  transition: opacity 0.18s, transform 0.18s;
-}
-.toast-enter-from,
-.toast-leave-to {
-  opacity: 0;
-  transform: translateY(8px);
-}
-
-/* 手機：每列改成上下堆疊 */
-@media (max-width: 720px) {
-  .cols-head {
-    display: none;
-  }
-  .row {
-    grid-template-columns: auto 1fr auto;
-    grid-template-areas: 'h i a' 't t t' 'l l l' 's s s';
-    row-gap: 8px;
-  }
-  .handle {
-    grid-area: h;
-    height: 40px;
-  }
-  .idx {
-    grid-area: i;
-  }
-  .ttl {
-    grid-area: t;
-  }
-  .loc {
-    grid-area: l;
-  }
-  .sn {
-    grid-area: s;
-  }
-  .acts {
-    grid-area: a;
-  }
-  .lbl {
-    display: block;
-  }
-  .opt {
-    flex-basis: 100%;
-    order: 5;
-  }
-  .spacer {
-    display: none;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .row.flash {
-    animation: none;
-  }
-  .toast-enter-active,
-  .toast-leave-active {
-    transition: none;
-  }
 }
 </style>
