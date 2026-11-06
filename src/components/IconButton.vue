@@ -4,28 +4,6 @@ defineProps<{ danger?: boolean }>()
 </script>
 
 <template>
-  <button type="button" class="icon" :class="{ del: danger }"><slot /></button>
+  <button type="button" class="grid size-10 cursor-pointer place-items-center rounded-md border-0 bg-transparent p-0 text-muted"
+    :class="danger ? 'hover:bg-danger-soft hover:text-danger' : 'hover:bg-bg hover:text-ink'"><slot /></button>
 </template>
-
-<style scoped>
-.icon {
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-}
-.icon:hover {
-  background: var(--bg);
-  color: var(--ink);
-}
-.icon.del:hover {
-  background: var(--danger-soft);
-  color: var(--danger);
-}
-</style>

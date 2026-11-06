@@ -27,49 +27,13 @@ function onClear() {
 </script>
 
 <template>
-  <div class="bar">
+  <div class="mt-5 mb-3 flex flex-wrap items-center gap-2">
     <AppButton variant="primary" @click="emit('add')">＋ 新增一列</AppButton>
     <AppButton title="以 Tab 分隔（書名、館藏地點、序號），可直接貼到 Excel" @click="emit('copy')">複製全部</AppButton>
-    <label class="opt"><input v-model="inc" type="checkbox" /> 複製列時，序號自動 +1</label>
-    <span class="spacer" />
+    <label class="inline-flex cursor-pointer items-center gap-2 text-sm text-muted max-[720px]:order-5 max-[720px]:basis-full"><input v-model="inc" type="checkbox" class="m-0 size-4 accent-accent" /> 複製列時，序號自動 +1</label>
+    <span class="flex-1 max-[720px]:hidden" />
     <AppButton variant="quiet" :armed="armed" @click="onClear">
       {{ armed ? '再按一次清空全部' : '全部清空' }}
     </AppButton>
   </div>
 </template>
-
-<style scoped>
-.bar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin: 20px 0 12px;
-}
-.spacer {
-  flex: 1 1 0;
-}
-.opt {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--muted);
-  cursor: pointer;
-}
-.opt input {
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  accent-color: var(--accent);
-}
-@media (max-width: 720px) {
-  .opt {
-    flex-basis: 100%;
-    order: 5;
-  }
-  .spacer {
-    display: none;
-  }
-}
-</style>

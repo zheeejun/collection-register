@@ -23,19 +23,19 @@ const rows = defineModel<Row[]>({ required: true })
 </script>
 
 <template>
-  <div class="register">
-    <p class="hint">拖曳左側握把可調整順序，握把上按 ↑ ↓ 鍵也可以移動。資料會自動存在這個瀏覽器。</p>
-    <div class="cols-head" aria-hidden="true">
+  <div class="[--cols:32px_44px_minmax(0,1.15fr)_minmax(0,1fr)_minmax(140px,190px)_84px]">
+    <p class="mb-2.5 text-[13px] text-muted">拖曳左側握把可調整順序，握把上按 ↑ ↓ 鍵也可以移動。資料會自動存在這個瀏覽器。</p>
+    <div class="grid grid-cols-(--cols) items-center gap-2.5 px-[13px] pb-1.5 text-xs tracking-[0.08em] text-muted max-[720px]:hidden" aria-hidden="true">
       <span /><span>#</span><span>書名</span><span>館藏地點</span><span>序號</span><span />
     </div>
 
-    <draggable v-model="rows" tag="ol" class="list" item-key="id" handle=".handle" :animation="150" ghost-class="ghost" chosen-class="chosen">
+    <draggable v-model="rows" tag="ol" class="m-0 grid list-none gap-2 p-0" item-key="id" handle=".handle" :animation="150" ghost-class="ghost" chosen-class="chosen">
       <template #item="{ element: row, index }">
-        <li class="row" :class="{ flash: row.id === flashId }">
+        <li class="row grid grid-cols-(--cols) items-center gap-2.5 rounded-lg border border-line bg-surface px-3 py-2.5 max-[720px]:grid-cols-[auto_1fr_auto] max-[720px]:gap-y-2 max-[720px]:[grid-template-areas:'h_i_a'_'t_t_t'_'l_l_l'_'s_s_s']" :class="{ flash: row.id === flashId }">
           <button
             :id="`handle-${row.id}`"
             type="button"
-            class="handle"
+            class="handle grid h-11 w-8 cursor-grab touch-none place-items-center rounded-md border-0 bg-transparent p-0 text-muted select-none [-webkit-touch-callout:none] hover:bg-bg hover:text-ink max-[720px]:h-10 max-[720px]:[grid-area:h]"
             :aria-label="`拖曳排序：第 ${index + 1} 列`"
             title="拖曳排序（也可按 ↑ ↓ 鍵）"
             @keydown.up.prevent="emit('move', index, -1)"
@@ -50,10 +50,10 @@ const rows = defineModel<Row[]>({ required: true })
             </svg>
           </button>
 
-          <div class="idx">{{ String(index + 1).padStart(2, '0') }}</div>
+          <div class="font-mono text-[13px] leading-[1.2] text-muted tabular-nums max-[720px]:[grid-area:i]">{{ String(index + 1).padStart(2, '0') }}</div>
 
-          <div class="f ttl">
-            <label class="lbl" :for="`title-${row.id}`">書名</label>
+          <div class="block min-w-0 max-[720px]:[grid-area:t]">
+            <label class="mb-1 hidden text-xs tracking-[0.04em] text-muted max-[720px]:block" :for="`title-${row.id}`">書名</label>
             <input
               :id="`title-${row.id}`"
               v-model="row.title"
@@ -66,8 +66,8 @@ const rows = defineModel<Row[]>({ required: true })
             />
           </div>
 
-          <div class="f loc">
-            <label class="lbl" :for="`loc-${row.id}`">館藏地點</label>
+          <div class="block min-w-0 max-[720px]:[grid-area:l]">
+            <label class="mb-1 hidden text-xs tracking-[0.04em] text-muted max-[720px]:block" :for="`loc-${row.id}`">館藏地點</label>
             <LocationInput
               v-model="row.loc"
               :input-id="`loc-${row.id}`"
@@ -80,10 +80,11 @@ const rows = defineModel<Row[]>({ required: true })
             />
           </div>
 
-          <div class="f sn">
-            <label class="lbl" :for="`sn-${row.id}`">序號</label>
+          <div class="block min-w-0 max-[720px]:[grid-area:s]">
+            <label class="mb-1 hidden text-xs tracking-[0.04em] text-muted max-[720px]:block" :for="`sn-${row.id}`">序號</label>
             <input
               :id="`sn-${row.id}`"
+              class="border-accent-line bg-accent-soft font-mono font-medium tracking-[0.04em] focus:border-accent"
               v-model="row.sn"
               type="text"
               autocomplete="off"
@@ -95,7 +96,7 @@ const rows = defineModel<Row[]>({ required: true })
             />
           </div>
 
-          <div class="acts">
+          <div class="flex gap-0.5 max-[720px]:[grid-area:a]">
             <IconButton :aria-label="`複製第 ${index + 1} 列`" title="複製這一列" @click="emit('dup', index)">
               <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="7" y="7" width="9" height="9" rx="1.5" />
@@ -115,41 +116,6 @@ const rows = defineModel<Row[]>({ required: true })
 </template>
 
 <style scoped>
-.register {
-  /* 欄寬：握把 / 列號 / 書名 / 館藏地點 / 序號 / 操作鈕，要調整改這一行 */
-  --cols: 32px 44px minmax(0, 1.15fr) minmax(0, 1fr) minmax(140px, 190px) 84px;
-}
-.hint {
-  margin: 0 0 10px;
-  font-size: 13px;
-  color: var(--muted);
-}
-.list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 8px;
-}
-.cols-head,
-.row {
-  display: grid;
-  grid-template-columns: var(--cols);
-  align-items: center;
-  gap: 10px;
-}
-.cols-head {
-  padding: 0 13px 6px;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-.row {
-  padding: 10px 12px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
 .row.flash {
   animation: flash 1s ease-out;
 }
@@ -159,7 +125,7 @@ const rows = defineModel<Row[]>({ required: true })
     border-color: var(--accent);
   }
 }
-/* 拖曳中的樣式（SortableJS 會加上這些 class） */
+/* SortableJS adds these classes during dragging. */
 .ghost {
   opacity: 0.45;
   border-color: var(--accent);
@@ -168,88 +134,6 @@ const rows = defineModel<Row[]>({ required: true })
 .chosen {
   border-color: var(--accent);
   box-shadow: var(--shadow);
-}
-
-.handle {
-  width: 32px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--muted);
-  cursor: grab;
-  touch-action: none;
-  -webkit-touch-callout: none;
-  user-select: none;
-}
-.handle:hover {
-  background: var(--bg);
-  color: var(--ink);
-}
-.idx {
-  font: 13px/1.2 var(--f-mono);
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.f {
-  display: block;
-  min-width: 0;
-}
-.lbl {
-  display: none;
-  margin-bottom: 4px;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-}
-/* 序號欄：像索書號標籤 */
-.sn input {
-  font-family: var(--f-mono);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  background: var(--accent-soft);
-  border-color: var(--accent-line);
-}
-.acts {
-  display: flex;
-  gap: 2px;
-}
-
-/* 手機：每列改成上下堆疊 */
-@media (max-width: 720px) {
-  .cols-head {
-    display: none;
-  }
-  .row {
-    grid-template-columns: auto 1fr auto;
-    grid-template-areas: 'h i a' 't t t' 'l l l' 's s s';
-    row-gap: 8px;
-  }
-  .handle {
-    grid-area: h;
-    height: 40px;
-  }
-  .idx {
-    grid-area: i;
-  }
-  .ttl {
-    grid-area: t;
-  }
-  .loc {
-    grid-area: l;
-  }
-  .sn {
-    grid-area: s;
-  }
-  .acts {
-    grid-area: a;
-  }
-  .lbl {
-    display: block;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .row.flash {

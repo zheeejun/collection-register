@@ -163,9 +163,10 @@ onBeforeUnmount(removeListeners)
 </script>
 
 <template>
-  <div class="loc-wrap">
+  <div class="relative">
     <input
       ref="inputEl"
+      class="pr-[42px]"
       :id="inputId"
       type="text"
       role="combobox"
@@ -181,7 +182,7 @@ onBeforeUnmount(removeListeners)
       @compositionstart="composing = true"
       @compositionend="onCompositionEnd"
     />
-    <button ref="chevEl" type="button" class="chev" tabindex="-1" aria-label="開啟地點清單" title="地點清單" @click="toggle">
+    <button ref="chevEl" type="button" class="absolute right-0.5 bottom-0.5 grid size-10 cursor-pointer place-items-center rounded-[5px] border-0 bg-transparent p-0 text-muted hover:bg-bg hover:text-ink" tabindex="-1" aria-label="開啟地點清單" title="地點清單" @click="toggle">
       <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M5.5 8l4.5 4.5L14.5 8" />
       </svg>
@@ -189,130 +190,20 @@ onBeforeUnmount(removeListeners)
 
     <!-- 放到 body，避免被列的邊界或拖曳動畫切到 -->
     <Teleport to="body">
-      <div v-if="open" ref="menuEl" class="loc-menu" role="listbox" aria-label="館藏地點清單" :style="menuStyle" @mousedown.prevent>
-        <div v-for="(o, i) in shown" :key="o" class="mi">
-          <button type="button" class="pick" role="option" :aria-selected="o === typed" :class="{ on: active === i, cur: o === typed }" @click="pick(o)">
+      <div v-if="open" ref="menuEl" class="fixed z-30 overflow-y-auto rounded-lg border border-line-strong bg-surface p-1 shadow-panel" role="listbox" aria-label="館藏地點清單" :style="menuStyle" @mousedown.prevent>
+        <div v-for="(o, i) in shown" :key="o" class="flex items-center">
+          <button type="button" class="min-w-0 flex-1 cursor-pointer rounded-[5px] border-0 bg-transparent px-2.5 py-[9px] text-left font-body text-[15px] leading-[1.4] text-ink wrap-anywhere hover:bg-accent-soft [&.on]:bg-accent-soft" role="option" :aria-selected="o === typed" :class="{ on: active === i, 'text-accent! font-bold': o === typed }" @click="pick(o)">
             {{ o }}
           </button>
-          <button type="button" class="rm" :aria-label="`從清單移除 ${o}`" title="從清單移除" @click="emit('remove', o)">×</button>
+          <button type="button" class="size-8 flex-none cursor-pointer rounded-[5px] border-0 bg-transparent text-lg leading-none text-muted hover:bg-danger-soft hover:text-danger" :aria-label="`從清單移除 ${o}`" title="從清單移除" @click="emit('remove', o)">×</button>
         </div>
-        <p v-if="!shown.length && !addable" class="none">
+        <p v-if="!shown.length && !addable" class="m-0 p-2.5 text-[13px] text-muted">
           {{ options.length ? '沒有符合的地點' : '清單還是空的。在欄位輸入地點後，可以加入清單。' }}
         </p>
-        <button v-if="addable" type="button" class="addloc" :class="{ on: active === shown.length }" @click="addCurrent">
+        <button v-if="addable" type="button" class="mt-1 block w-full cursor-pointer rounded-b-[5px] border-0 border-t border-line bg-transparent p-2.5 text-left font-body text-sm leading-[1.4] font-medium text-accent wrap-anywhere first:mt-0 first:rounded-[5px] first:border-t-0 hover:bg-accent-soft [&.on]:bg-accent-soft" :class="{ on: active === shown.length }" @click="addCurrent">
           ＋ 將「{{ typed }}」加入清單
         </button>
       </div>
     </Teleport>
   </div>
 </template>
-
-<style scoped>
-.loc-wrap {
-  position: relative;
-}
-.loc-wrap input {
-  padding-right: 42px;
-}
-.chev {
-  position: absolute;
-  right: 2px;
-  bottom: 2px;
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-}
-.chev:hover {
-  background: var(--bg);
-  color: var(--ink);
-}
-
-.loc-menu {
-  position: fixed;
-  z-index: 30;
-  overflow-y: auto;
-  padding: 4px;
-  background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
-}
-.mi {
-  display: flex;
-  align-items: center;
-}
-.pick {
-  flex: 1;
-  min-width: 0;
-  padding: 9px 10px;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
-  color: var(--ink);
-  font: 15px/1.4 var(--f-body);
-  text-align: left;
-  overflow-wrap: anywhere;
-  cursor: pointer;
-}
-.pick:hover,
-.pick.on,
-.addloc.on {
-  background: var(--accent-soft);
-}
-.pick.cur {
-  color: var(--accent);
-  font-weight: 700;
-}
-.rm {
-  flex: none;
-  width: 32px;
-  height: 32px;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 18px;
-  line-height: 1;
-  cursor: pointer;
-}
-.rm:hover {
-  background: var(--danger-soft);
-  color: var(--danger);
-}
-.addloc {
-  display: block;
-  width: 100%;
-  margin-top: 4px;
-  padding: 10px;
-  border: 0;
-  border-top: 1px solid var(--line);
-  border-radius: 0 0 5px 5px;
-  background: transparent;
-  color: var(--accent);
-  font: 500 14px/1.4 var(--f-body);
-  text-align: left;
-  overflow-wrap: anywhere;
-  cursor: pointer;
-}
-.addloc:first-child {
-  margin-top: 0;
-  border-top: 0;
-  border-radius: 5px;
-}
-.addloc:hover {
-  background: var(--accent-soft);
-}
-.none {
-  margin: 0;
-  padding: 10px;
-  font-size: 13px;
-  color: var(--muted);
-}
-</style>

@@ -6,49 +6,16 @@ const emit = defineEmits<{ (e: 'undo'): void }>()
 
 <template>
   <Transition name="toast">
-    <div v-if="msg" class="toast">
-      <div class="in" role="status">
+    <div v-if="msg" class="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pt-3 pr-[max(16px,env(safe-area-inset-right,0px))] pb-[calc(12px+env(safe-area-inset-bottom,0px))] pl-[max(16px,env(safe-area-inset-left,0px))]">
+      <div class="pointer-events-auto flex max-w-[560px] items-center gap-4 rounded-lg bg-ink px-3.5 py-2.5 text-sm text-bg shadow-panel" role="status">
         <span>{{ msg }}</span>
-        <button v-if="canUndo" type="button" class="undo" @click="emit('undo')">復原</button>
+        <button v-if="canUndo" type="button" class="cursor-pointer border-0 bg-transparent px-0.5 py-1 font-body text-sm leading-normal font-bold text-toast-link underline" @click="emit('undo')">復原</button>
       </div>
     </div>
   </Transition>
 </template>
 
 <style scoped>
-.toast {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 40;
-  display: flex;
-  justify-content: center;
-  padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
-  pointer-events: none;
-}
-.toast .in {
-  pointer-events: auto;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  max-width: 560px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  background: var(--ink);
-  color: var(--bg);
-  box-shadow: var(--shadow);
-  font-size: 14px;
-}
-.toast .undo {
-  padding: 4px 2px;
-  border: 0;
-  background: transparent;
-  color: var(--toast-link);
-  font: 700 14px var(--f-body);
-  text-decoration: underline;
-  cursor: pointer;
-}
 .toast-enter-active,
 .toast-leave-active {
   transition: opacity 0.18s, transform 0.18s;

@@ -192,10 +192,10 @@ function clearAll() {
 </script>
 
 <template>
-  <main class="wrap">
-    <header class="top">
-      <h1>Collection Register</h1>
-      <p class="sub">{{ summary }}</p>
+  <main class="mx-auto max-w-[1000px] pt-7 pr-[max(16px,env(safe-area-inset-right,0px))] pb-[120px] pl-[max(16px,env(safe-area-inset-left,0px))]">
+    <header class="flex flex-wrap items-end gap-x-4 gap-y-1">
+      <h1 class="m-0 font-display text-[clamp(26px,5vw,34px)] leading-[1.2] font-bold tracking-[0.02em] text-balance">Collection Register</h1>
+      <p class="mb-1 text-sm text-muted tabular-nums">{{ summary }}</p>
     </header>
 
     <RegisterToolbar v-model:inc="incSerial" :empty="!rows.length" @add="addRow" @copy="copyAll" @clear="clearAll" />
@@ -218,120 +218,3 @@ function clearAll() {
 
   <AppToast :msg="toast?.msg" :can-undo="!!toast?.undo" @undo="undo" />
 </template>
-
-<!-- 全域：字體、色彩（Tailwind teal）、基本元件。要換顏色改這裡的 --accent 系列即可 -->
-<style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700&display=swap');
-
-:root {
-  --bg: #edf0ee;
-  --surface: #fafbfa;
-  --field: #ffffff;
-  --line: #ccd5d1;
-  --line-strong: #aebab5;
-  --ink: #16211f;
-  --muted: #586763;
-
-  /* 主色：Tailwind teal（淺色用 700，深色用 400） */
-  --accent: #0f766e; /* teal-700 */
-  --accent-ink: #ffffff;
-  --accent-soft: #f0fdfa; /* teal-50 */
-  --accent-line: #99f6e4; /* teal-200 */
-  --toast-link: #5eead4; /* teal-300 */
-
-  --danger: #b3261e;
-  --danger-soft: #fbe7e5;
-  --on-danger: #ffffff;
-  --shadow: 0 12px 30px -10px rgba(22, 33, 31, 0.35);
-
-  --f-display: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
-  --f-body: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
-  --f-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1413;
-    --surface: #162120;
-    --field: #0f1918;
-    --line: #2a3937;
-    --line-strong: #3e504d;
-    --ink: #e7efed;
-    --muted: #98a9a5;
-
-    --accent: #2dd4bf; /* teal-400 */
-    --accent-ink: #042f2e; /* teal-950 */
-    --accent-soft: #042f2e; /* teal-950 */
-    --accent-line: #115e59; /* teal-800 */
-    --toast-link: #0f766e; /* teal-700 */
-
-    --danger: #ff8f86;
-    --danger-soft: #3a1c1a;
-    --on-danger: #3a0b08;
-    --shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7);
-    color-scheme: dark;
-  }
-}
-
-* {
-  box-sizing: border-box;
-}
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font: 15px/1.55 var(--f-body);
-}
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-input[type='text'] {
-  width: 100%;
-  min-width: 0;
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--field);
-  color: var(--ink);
-  font: 16px var(--f-body); /* 16px 以上，iOS 才不會自動放大 */
-}
-input[type='text']::placeholder {
-  color: var(--muted);
-  opacity: 0.7;
-}
-input[type='text']:hover {
-  border-color: var(--line-strong);
-}
-input[type='text']:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: 0;
-  border-color: var(--accent);
-}
-</style>
-
-<style scoped>
-.wrap {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 28px max(16px, env(safe-area-inset-right, 0px)) 120px max(16px, env(safe-area-inset-left, 0px));
-}
-.top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 4px 16px;
-}
-h1 {
-  margin: 0;
-  font: 700 clamp(26px, 5vw, 34px) / 1.2 var(--f-display);
-  letter-spacing: 0.02em;
-  text-wrap: balance;
-}
-.sub {
-  margin: 0 0 4px;
-  color: var(--muted);
-  font-size: 14px;
-  font-variant-numeric: tabular-nums;
-}
-</style>
