@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700&display=swap');
 @import "tailwindcss" source("./components");
 @source "./App.vue";
 
@@ -26,7 +25,7 @@
 
 @layer base {
   :root {
-    --bg: #edf0ee;
+    --bg: rgb(243, 244, 246);/* gray-200 */
     --surface: #fafbfa;
     --field: #ffffff;
     --line: #ccd5d1;
@@ -34,18 +33,17 @@
     --ink: #16211f;
     --muted: #586763;
 
-    /* 主色：Tailwind teal（淺色用 700，深色用 400） */
-    --accent: #0f766e; /* teal-700 */
+    /* 主色：Tailwind indigo（淺色用 700，深色用 400） */
+    --accent: #4338ca; /* indigo-700 */
     --accent-ink: #ffffff;
-    --accent-soft: #f0fdfa; /* teal-50 */
-    --accent-line: #99f6e4; /* teal-200 */
-    --toast-link: #5eead4; /* teal-300 */
+    --accent-soft: #eef2ff; /* indigo-50 */
+    --accent-line: #c7d2fe; /* indigo-200 */ 
+    --toast-link: #a5b4fc; /* indigo-300 */
 
     --danger: #b3261e;
     --danger-soft: #fbe7e5;
     --on-danger: #ffffff;
     --shadow: 0 12px 30px -10px rgba(22, 33, 31, 0.35);
-
     --f-display: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif;
     --f-body: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
     --f-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
@@ -60,11 +58,11 @@
       --ink: #e7efed;
       --muted: #98a9a5;
 
-      --accent: #2dd4bf; /* teal-400 */
-      --accent-ink: #042f2e; /* teal-950 */
-      --accent-soft: #042f2e; /* teal-950 */
-      --accent-line: #115e59; /* teal-800 */
-      --toast-link: #0f766e; /* teal-700 */
+      --accent: #818cf8; /* indigo-400 */
+      --accent-ink: #1e1b4b; /* indigo-950 */
+      --accent-soft: #1e1b4b; /* indigo-950 */
+      --accent-line: #3730a3; /* indigo-800 */
+      --toast-link: #4338ca; /* indigo-700 */
 
       --danger: #ff8f86;
       --danger-soft: #3a1c1a;
@@ -72,6 +70,37 @@
       --shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.7);
       color-scheme: dark;
     }
+  }
+
+  /* Scope the indigo palette to collection rows and the location list. */
+  :is(.register-list, .location-menu) {
+    --bg: #E0E7FF;
+    --surface: #EEF2FF;
+    --field: #FFFFFF;
+    --line: #C7D2FE;
+    --line-strong: #A5B4FC;
+    --ink: #1E1B4B;
+    --muted: #4338CA;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) :is(.register-list, .location-menu) {
+      --bg: #312E81;
+      --surface: #1E1B4B;
+      --field: #171433;
+      --line: #3730A3;
+      --line-strong: #6366F1;
+      --ink: #EEF2FF;
+      --muted: #A5B4FC;
+    }
+  }
+  :root[data-theme="dark"] :is(.register-list, .location-menu) {
+    --bg: #312E81;
+    --surface: #1E1B4B;
+    --field: #171433;
+    --line: #3730A3;
+    --line-strong: #6366F1;
+    --ink: #EEF2FF;
+    --muted: #A5B4FC;
   }
 
   * {
@@ -96,7 +125,7 @@
     border-radius: 6px;
     background: var(--field);
     color: var(--ink);
-    font: 16px var(--f-body); /* 16px 以上，iOS 才不會自動放大 */
+    font: 16px var(--f-body);
   }
   input[type='text']::placeholder {
     color: var(--muted);

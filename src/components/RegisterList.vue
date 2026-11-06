@@ -5,6 +5,8 @@
  * 焦點移動靠 id（handle-、title-、loc-、sn- 加 row.id），由 App 處理。
  */
 import draggable from 'vuedraggable'
+import AppInput from './AppInput.vue'
+import { DragHandleIcon } from './icons'
 import IconButton from './IconButton.vue'
 import LocationInput from './LocationInput.vue'
 import type { Field, Row } from '../types'
@@ -23,8 +25,8 @@ const rows = defineModel<Row[]>({ required: true })
 </script>
 
 <template>
-  <div class="[--cols:32px_44px_minmax(0,1.15fr)_minmax(0,1fr)_minmax(140px,190px)_84px]">
-    <p class="mb-2.5 text-[13px] text-muted">拖曳左側握把可調整順序，握把上按 ↑ ↓ 鍵也可以移動。資料會自動存在這個瀏覽器。</p>
+  <div class="register-list [--cols:32px_44px_minmax(0,1.15fr)_minmax(0,1fr)_minmax(140px,190px)_84px] space-y-4">
+    <p class="text-xs text-muted">拖曳左側握把可調整順序，握把上按 ↑ ↓ 鍵也可以移動。資料會自動存在這個瀏覽器。</p>
     <div class="grid grid-cols-(--cols) items-center gap-2.5 px-[13px] pb-1.5 text-xs tracking-[0.08em] text-muted max-[720px]:hidden" aria-hidden="true">
       <span /><span>#</span><span>書名</span><span>館藏地點</span><span>序號</span><span />
     </div>
@@ -41,23 +43,16 @@ const rows = defineModel<Row[]>({ required: true })
             @keydown.up.prevent="emit('move', index, -1)"
             @keydown.down.prevent="emit('move', index, 1)"
           >
-            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
-              <g fill="currentColor">
-                <circle cx="7" cy="5" r="1.5" /><circle cx="13" cy="5" r="1.5" />
-                <circle cx="7" cy="10" r="1.5" /><circle cx="13" cy="10" r="1.5" />
-                <circle cx="7" cy="15" r="1.5" /><circle cx="13" cy="15" r="1.5" />
-              </g>
-            </svg>
+            <DragHandleIcon />
           </button>
 
           <div class="font-mono text-[13px] leading-[1.2] text-muted tabular-nums max-[720px]:[grid-area:i]">{{ String(index + 1).padStart(2, '0') }}</div>
 
           <div class="block min-w-0 max-[720px]:[grid-area:t]">
             <label class="mb-1 hidden text-xs tracking-[0.04em] text-muted max-[720px]:block" :for="`title-${row.id}`">書名</label>
-            <input
+            <AppInput
               :id="`title-${row.id}`"
               v-model="row.title"
-              type="text"
               autocomplete="off"
               maxlength="300"
               placeholder="例：書名"
@@ -67,7 +62,7 @@ const rows = defineModel<Row[]>({ required: true })
           </div>
 
           <div class="block min-w-0 max-[720px]:[grid-area:l]">
-            <label class="mb-1 hidden text-xs tracking-[0.04em] text-muted max-[720px]:block" :for="`loc-${row.id}`">館藏地點</label>
+            <label class="mb-1 hidden text-xs text-muted max-[720px]:block" :for="`loc-${row.id}`">館藏地點</label>
             <LocationInput
               v-model="row.loc"
               :input-id="`loc-${row.id}`"
@@ -81,12 +76,11 @@ const rows = defineModel<Row[]>({ required: true })
           </div>
 
           <div class="block min-w-0 max-[720px]:[grid-area:s]">
-            <label class="mb-1 hidden text-xs tracking-[0.04em] text-muted max-[720px]:block" :for="`sn-${row.id}`">序號</label>
-            <input
+            <label class="mb-1 hidden text-xs text-muted max-[720px]:block" :for="`sn-${row.id}`">序號</label>
+            <AppInput
               :id="`sn-${row.id}`"
-              class="border-accent-line bg-accent-soft font-mono font-medium tracking-[0.04em] focus:border-accent"
+              class="border-accent-line bg-accent-soft font-medium tracking-[0.04em] focus:border-accent"
               v-model="row.sn"
-              type="text"
               autocomplete="off"
               spellcheck="false"
               maxlength="100"

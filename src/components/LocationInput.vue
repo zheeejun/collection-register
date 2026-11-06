@@ -190,7 +190,7 @@ onBeforeUnmount(removeListeners)
 
     <!-- 放到 body，避免被列的邊界或拖曳動畫切到 -->
     <Teleport to="body">
-      <div v-if="open" ref="menuEl" class="fixed z-30 overflow-y-auto rounded-lg border border-line-strong bg-surface p-1 shadow-panel" role="listbox" aria-label="館藏地點清單" :style="menuStyle" @mousedown.prevent>
+      <div v-if="open" ref="menuEl" class="location-menu fixed z-30 overflow-y-auto rounded-lg border border-line-strong bg-surface p-1 shadow-panel" role="listbox" aria-label="館藏地點清單" :style="menuStyle" @mousedown.prevent>
         <div v-for="(o, i) in shown" :key="o" class="flex items-center">
           <button type="button" class="min-w-0 flex-1 cursor-pointer rounded-[5px] border-0 bg-transparent px-2.5 py-[9px] text-left font-body text-[15px] leading-[1.4] text-ink wrap-anywhere hover:bg-accent-soft [&.on]:bg-accent-soft" role="option" :aria-selected="o === typed" :class="{ on: active === i, 'text-accent! font-bold': o === typed }" @click="pick(o)">
             {{ o }}

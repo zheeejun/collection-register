@@ -9,6 +9,10 @@ import AppToast from './components/AppToast.vue'
 import EmptyState from './components/EmptyState.vue'
 import RegisterList from './components/RegisterList.vue'
 import RegisterToolbar from './components/RegisterToolbar.vue'
+import ShareLinkDialog from './components/ShareLinkDialog.vue'
+import SharedCollection from './components/SharedCollection.vue'
+import { createShareUrl, readShareHash } from './share'
+import type { SharedCollection as SharedCollectionData } from './share'
 import type { Field, Row } from './types'
 
 const STORAGE_KEY = 'collection-register-vue-v1'
@@ -39,7 +43,14 @@ function load() {
   return { rows, locs, inc: !!d?.inc }
 }
 
-const saved = load()
+const isSharedView = window.location.hash.startsWith('#share=')
+const sharedCollection = ref<SharedCollectionData | null>(null)
+const sharedError = ref('')
+if (isSharedView) {
+  readShareHash(window.location.hash).then(data => { sharedCollection.value = data })
+    .catch(() => { sharedError.value = '無法讀取分享資料，請確認連結完整後再試。' })
+}
+const saved = isSharedView ? { rows: [], locs: [], inc: false } : load()
 const rows = ref<Row[]>(saved.rows)
 const locs = ref<string[]>(saved.locs) // 館藏地點下拉清單
 const incSerial = ref(saved.inc) // 複製列時序號 +1
@@ -47,6 +58,7 @@ const incSerial = ref(saved.inc) // 複製列時序號 +1
 watch(
   [rows, locs, incSerial],
   () => {
+    if (isSharedView) return
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ rows: rows.value, locs: locs.value, inc: incSerial.value }))
     } catch {
@@ -160,6 +172,20 @@ function removeLoc(v: string) {
 }
 
 /* ---------- 工具列 ---------- */
+const shareUrl = ref('')
+const sharing = ref(false)
+async function shareCollection() {
+  if (sharing.value) return
+  sharing.value = true
+  try {
+    shareUrl.value = await createShareUrl(rows.value, import.meta.env.VITE_PUBLIC_SITE_URL || window.location.href)
+  } catch (error) {
+    showToast(error instanceof Error ? error.message : '無法產生分享網址，請再試一次')
+  } finally {
+    sharing.value = false
+  }
+}
+
 function legacyCopy(text: string) {
   const ta = document.createElement('textarea')
   ta.value = text
@@ -192,13 +218,14 @@ function clearAll() {
 </script>
 
 <template>
-  <main class="mx-auto max-w-[1000px] pt-7 pr-[max(16px,env(safe-area-inset-right,0px))] pb-[120px] pl-[max(16px,env(safe-area-inset-left,0px))]">
+  <SharedCollection v-if="isSharedView" :collection="sharedCollection" :error="sharedError" />
+  <main v-else class="mx-auto max-w-4xl pt-7 pr-[max(16px,env(safe-area-inset-right,0px))] pb-[120px] pl-[max(16px,env(safe-area-inset-left,0px))]">
     <header class="flex flex-wrap items-end gap-x-4 gap-y-1">
-      <h1 class="m-0 font-display text-[clamp(26px,5vw,34px)] leading-[1.2] font-bold tracking-[0.02em] text-balance">Collection Register</h1>
+      <h1 class="text-xl font-semibold">圖書館藏</h1>
       <p class="mb-1 text-sm text-muted tabular-nums">{{ summary }}</p>
     </header>
 
-    <RegisterToolbar v-model:inc="incSerial" :empty="!rows.length" @add="addRow" @copy="copyAll" @clear="clearAll" />
+    <RegisterToolbar v-model:inc="incSerial" :empty="!rows.length" :sharing="sharing" @add="addRow" @copy="copyAll" @clear="clearAll" @share="shareCollection" />
 
     <RegisterList
       v-if="rows.length"
@@ -217,4 +244,5 @@ function clearAll() {
   </main>
 
   <AppToast :msg="toast?.msg" :can-undo="!!toast?.undo" @undo="undo" />
+  <ShareLinkDialog v-if="shareUrl" :url="shareUrl" @close="shareUrl = ''" />
 </template>
