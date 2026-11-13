@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /** 工具列。「全部清空」要按兩次，第二次才發出 clear。 */
 import { ref } from 'vue'
-import AppButton from './AppButton.vue'
+import AppButton from './appbutton/appbutton.vue'
 
 const props = defineProps<{ empty: boolean; sharing?: boolean }>()
 const emit = defineEmits<{

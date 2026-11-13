@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import AppButton from './AppButton.vue'
+import AppButton from './appbutton/appbutton.vue'
 
 const props = defineProps<{ url: string }>()
 const emit = defineEmits<{ (event: 'close'): void }>()

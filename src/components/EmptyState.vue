@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AppButton from './AppButton.vue'
+import AppButton from './appbutton/appbutton.vue'
 
 const emit = defineEmits<{ (e: 'add'): void }>()
 </script>

@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "test": "node --test scripts/library.test.mjs scripts/library-components.test.mjs",
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "build:standalone": "node scripts/build-standalone.mjs",

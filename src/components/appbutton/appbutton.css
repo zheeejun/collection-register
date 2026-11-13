@@ -1,0 +1,51 @@
+.app-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  background: #e5e7eb;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.app-button:hover {
+  border-color: var(--muted);
+  background: var(--field);
+}
+
+.app-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.app-button--primary {
+  background: #6366f1;
+  color: #eef2ff;
+}
+
+.app-button--primary:hover {
+  border-color: transparent;
+  background: #6366f1;
+  filter: brightness(1.1);
+}
+
+.app-button--quiet {
+  background: transparent;
+  color: var(--muted);
+}
+
+.app-button--quiet:hover {
+  border-color: transparent;
+  background: var(--surface);
+  color: var(--danger);
+}
+
+.app-button--armed,
+.app-button--armed:hover {
+  background: var(--danger);
+  color: var(--on-danger);
+}

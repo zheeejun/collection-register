@@ -1,0 +1,287 @@
+.library-app {
+  --bg: #f6f7fb;
+  --surface: #fff;
+  --field: #fff;
+  --ink: #222640;
+  --muted: #6d7288;
+  --line: #e5e7f0;
+  --accent: #5145a3;
+  --accent-soft: #eeecf8;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.65;
+  color-scheme: light;
+}
+
+.library-app :deep(a) {
+  color: inherit;
+  text-decoration: none;
+}
+
+.library-app :deep(button), .library-app :deep(input), .library-app :deep(select), .library-app :deep(textarea) {
+  font: inherit;
+}
+
+.library-app :deep(button) {
+  cursor: pointer;
+}
+
+.library-app :deep(button:disabled) {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.library-main {
+  margin-left: 252px;
+  padding: 27px 42px 20px;
+  max-width: 1650px;
+}
+
+.topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  font-size: 11px;
+  color: var(--muted);
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.topline time {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 31px 0 29px;
+}
+
+.eyebrow {
+  color: #928aaa;
+  font-size: 9px;
+  letter-spacing: 2.3px;
+  margin: 0 0 7px;
+}
+
+.page-heading h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.page-heading div > p:last-child {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.library-app :deep(.primary-button), .library-app :deep(.secondary-button), .library-app :deep(.danger-button) {
+  border: 1px solid transparent;
+  border-radius: 7px;
+  padding: 10px 17px;
+  line-height: 1.4;
+  white-space: nowrap;
+  font-size: 12px !important;
+}
+
+.library-app :deep(.primary-button) {
+  background: var(--accent);
+  color: #fff;
+}
+
+.library-app :deep(.primary-button:hover) {
+  background: #403681;
+}
+
+.library-app :deep(.secondary-button) {
+  background: #fff;
+  color: #595b74;
+  border-color: #dfe0eb;
+}
+
+.library-app :deep(.secondary-button:hover) {
+  background: #f4f2fa;
+}
+
+.library-app :deep(.danger-button) {
+  background: #a53342;
+  color: #fff;
+}
+
+.library-app :deep(.section-title) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px;
+}
+
+.library-app :deep(.section-title h2) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.library-app :deep(.section-title p) {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.library-app :deep(input:not([type='checkbox'])), .library-app :deep(select), .library-app :deep(textarea) {
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid #dfe1eb;
+  border-radius: 6px;
+  padding: 9px 11px;
+  min-height: 40px;
+  width: 100%;
+  min-width: 0;
+}
+
+.library-app :deep(input::placeholder), .library-app :deep(textarea::placeholder) {
+  color: #9698a9;
+  font-size: 12px;
+}
+
+.library-app :deep(textarea) {
+  resize: vertical;
+}
+
+.library-app :deep(.text-button) {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: 11px !important;
+  white-space: nowrap;
+}
+
+.library-app :deep(.text-button:hover) {
+  text-decoration: underline;
+}
+
+.library-app :deep(.danger-text) {
+  color: #a86c78;
+}
+
+.page-footer {
+  text-align: center;
+  margin: 30px 0 0;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  color: #9290a5;
+}
+
+.page-footer span {
+  margin: 0 8px;
+}
+
+.message {
+  padding: 12px 16px;
+  border-radius: 7px;
+  font-size: 12px;
+  margin: 0 0 20px;
+}
+
+.message.error {
+  background: #fcecef;
+  color: #a53342;
+}
+
+.message.success {
+  background: #eaf4ee;
+  color: #436e52;
+}
+
+.delete-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #ebc3cb;
+  background: #fff4f5;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.delete-confirm p {
+  margin: 0;
+  flex: 1;
+}
+
+@media (min-width:1600px) {
+  .library-main {
+    padding-inline: 65px;
+  }
+}
+
+@media (max-width:1100px) {
+  .library-main {
+    margin-left: 220px;
+    padding-inline: 24px;
+  }
+}
+
+@media (max-width:800px) {
+  .library-main {
+    margin-left: 0;
+    padding: 20px;
+  }
+  .topline {
+    font-size: 10px;
+    padding-bottom: 18px;
+  }
+  .page-heading {
+    padding-top: 24px;
+  }
+  .page-heading h1 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width:520px) {
+  .library-main {
+    padding: 18px 14px;
+  }
+  .page-heading {
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .page-heading h1 {
+    font-size: 22px;
+  }
+  .page-heading div > p:last-child {
+    max-width: 225px;
+    font-size: 11px;
+  }
+  .page-heading > button {
+    margin-top: 24px;
+    padding: 8px 10px;
+  }
+  .library-app :deep(.section-title) {
+    padding: 18px 15px;
+    gap: 8px;
+  }
+  .library-app :deep(.section-title h2) {
+    font-size: 14px;
+  }
+  .library-app :deep(.section-title p) {
+    font-size: 10px;
+  }
+  .library-app :deep(.section-title .primary-button) {
+    padding: 9px 11px;
+  }
+}
