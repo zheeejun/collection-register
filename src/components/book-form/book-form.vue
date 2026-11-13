@@ -13,8 +13,13 @@
         <input v-model="form.title" required maxlength="300" placeholder="輸入書名" autofocus>
       </label>
       <label>
-        作者
-        <input v-model="form.author" maxlength="200" placeholder="輸入作者">
+        借閱人
+        <select class="cursor-pointer" v-model="form.author">
+          <option value="">請選擇借閱人</option>
+          <option value="Js">Jessie</option>
+          <option value="Yang">Yang</option>
+          <option value="Fong">Fong</option>
+        </select>
       </label>
       <label>
         索書號／序號
@@ -22,14 +27,14 @@
       </label>
       <label>
         閱讀狀態
-        <select v-model="form.status">
+        <select class="cursor-pointer" v-model="form.status">
           <option v-for="(label, value) in statusLabels" :key="value" :value="value">{{ label }}</option>
         </select>
       </label>
       <label>
         實際館藏地點
         <span class="required">*</span>
-        <select v-model="form.locationId" required>
+        <select class="cursor-pointer" v-model="form.locationId" required>
           <option disabled value="">請選擇已建立的館藏地點</option>
           <option v-for="place in locations" :key="place.id" :value="place.id">
             {{ place.name }}
