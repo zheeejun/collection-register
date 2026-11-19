@@ -3,6 +3,7 @@ import type { Ref } from 'vue'
 import type { Book, LibraryLocation } from '../library'
 import type { Page } from '../app/app.interface'
 import type { LibraryStore } from './useLibraryStore'
+import { addLoanDays, LOAN_DAYS, renewalBlockReason } from '../library'
 
 export function useLibraryEditor(store: LibraryStore, page: Ref<Page>) {
   const { data, today, error, commit, snapshot } = store
@@ -12,7 +13,7 @@ export function useLibraryEditor(store: LibraryStore, page: Ref<Page>) {
   const placeForm = reactive<LibraryLocation>(emptyPlace())
   const pendingDelete = ref<{ kind: 'book' | 'location'; id: string; label: string } | null>(null)
   function emptyBook(): Book {
-    return { id: '', title: '', author: '', sn: '', locationId: '', status: 'available', reservedOn: '', borrowedOn: '', dueOn: '', notes: '' }
+    return { id: '', title: '', author: '', sn: '', locationId: '', status: 'available', reservedOn: '', borrowedOn: '', dueOn: '', hasReservation: false, renewalCount: 0, notes: '' }
   }
   function emptyPlace(): LibraryLocation { return { id: '', name: '', address: '', floor: '', shelf: '', notes: '' } }
   function closeEditor() {
@@ -22,11 +23,12 @@ export function useLibraryEditor(store: LibraryStore, page: Ref<Page>) {
   }
   function editBook(book?: Book) {
     closeEditor()
-    Object.assign(bookForm, book ?? {
+    Object.assign(bookForm, emptyBook(), book ?? {
       ...emptyBook(),
       status: page.value === 'reserved' ? 'reserved' : page.value === 'borrowed' ? 'borrowed' : 'available',
       reservedOn: page.value === 'reserved' ? today.value : '',
       borrowedOn: page.value === 'borrowed' ? today.value : '',
+      dueOn: page.value === 'borrowed' ? addLoanDays(today.value) : '',
     })
     editor.value = 'book'
   }
@@ -37,7 +39,7 @@ export function useLibraryEditor(store: LibraryStore, page: Ref<Page>) {
   }
 
   function prepareBorrow(book: Book) {
-    editBook({ ...book, status: 'borrowed', borrowedOn: today.value, dueOn: '' })
+    editBook({ ...book, status: 'borrowed', borrowedOn: today.value, dueOn: addLoanDays(today.value), hasReservation: false, renewalCount: 0 })
   }
   async function submitBook(form: Book) {
     if (!form.title.trim()) {
@@ -56,6 +58,18 @@ export function useLibraryEditor(store: LibraryStore, page: Ref<Page>) {
       error.value = '請填寫預約日期。'
       return
     }
+    const previous = data.value.books.find(item => item.id === form.id)
+    const continuingLoan = previous?.status === 'borrowed' && form.status === 'borrowed'
+    const renewalCount = continuingLoan ? previous.renewalCount ?? 0 : 0
+    const dueOn = form.status === 'borrowed'
+      ? continuingLoan && previous.borrowedOn === form.borrowedOn
+        ? previous.dueOn
+        : addLoanDays(form.borrowedOn, LOAN_DAYS * (renewalCount + 1))
+      : form.dueOn
+    if (form.status === 'borrowed' && !dueOn) {
+      error.value = '請填寫有效的借書日期。'
+      return
+    }
     const next = snapshot()
     const book = {
       ...toRaw(form),
@@ -63,6 +77,9 @@ export function useLibraryEditor(store: LibraryStore, page: Ref<Page>) {
       title: form.title.trim(),
       author: form.author.trim(),
       sn: form.sn.trim(),
+      dueOn,
+      renewalCount,
+      hasReservation: form.status === 'borrowed' && !!form.hasReservation,
     }
     const index = next.books.findIndex(item => item.id === book.id)
     if (index < 0) next.books.unshift(book)
@@ -91,6 +108,23 @@ export function useLibraryEditor(store: LibraryStore, page: Ref<Page>) {
     next.books.find(item => item.id === book.id)!.status = 'returned'
     await commit(next, `《${book.title}》已標記歸還`)
   }
+  async function setReservation(value: { id: string; hasReservation: boolean }) {
+    const next = snapshot()
+    const book = next.books.find(item => item.id === value.id)
+    if (!book || book.status !== 'borrowed') return
+    book.hasReservation = value.hasReservation
+    await commit(next, value.hasReservation ? '已標記有人預約，此書不能續借' : '已取消有人預約標記')
+  }
+  async function renewBook(value: Book) {
+    const next = snapshot()
+    const book = next.books.find(item => item.id === value.id)
+    if (!book) return
+    const reason = renewalBlockReason(book)
+    if (reason) { error.value = reason; return }
+    book.dueOn = addLoanDays(book.dueOn)
+    book.renewalCount = 1
+    await commit(next, `《${book.title}》已續借一次，到期日為 ${book.dueOn}`)
+  }
   function requestDelete(kind: 'book' | 'location', id: string, label: string) {
     error.value = ''
     if (kind === 'location' && locationCount(id)) {
@@ -109,5 +143,5 @@ export function useLibraryEditor(store: LibraryStore, page: Ref<Page>) {
     if (await commit(next, '資料已刪除')) pendingDelete.value = null
   }
 
-  return { editor, bookForm, placeForm, pendingDelete, closeEditor, editBook, editPlace, prepareBorrow, submitBook, submitPlace, returnBook, requestDelete, confirmDelete }
+  return { editor, bookForm, placeForm, pendingDelete, closeEditor, editBook, editPlace, prepareBorrow, submitBook, submitPlace, returnBook, setReservation, renewBook, requestDelete, confirmDelete }
 }

@@ -149,3 +149,5 @@ th:first-child, td:first-child {
   overflow-wrap: anywhere;
   max-width: 420px;
 }
+.reservation-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; white-space: nowrap; }
+.reservation-toggle input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }

@@ -91,6 +91,8 @@
         @edit-location="editPlace"
         @borrow="prepareBorrow"
         @return="returnBook"
+        @renew="renewBook"
+        @reservation="setReservation"
         @share="shareBooks"
         @delete-book="requestDelete('book', $event.id, $event.title)"
         @delete-location="requestDelete('location', $event.id, $event.name)"

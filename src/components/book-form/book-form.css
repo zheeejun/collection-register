@@ -32,6 +32,9 @@
   grid-column: 1 / -1;
 }
 
+.form-grid .reservation-checkbox { display: flex; align-items: center; gap: 8px; }
+.form-grid .reservation-checkbox input { margin: 0; width: 16px; height: 16px; accent-color: var(--accent); }
+
 .required {
   color: #a75b70;
 }

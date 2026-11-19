@@ -1,5 +1,6 @@
 @import "tailwindcss" source(none);
 @source "./collection-register-standalone.html";
+@source "./collection-register-standalone.js";
 
 @theme inline {
   --color-bg: var(--bg);

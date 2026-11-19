@@ -19,7 +19,13 @@ export function parseLibraryData(value: unknown): LibraryData {
       return Object.fromEntries(fields.map(field => [field, row[field]])) as T
     })
   }
-  const books = rows<Book>(source.books, bookFields)
+  const books = rows<Book>(source.books, bookFields).map((book, index): Book => {
+    const original = source.books as Record<string, unknown>[]
+    const hasReservation = original[index]!.hasReservation === undefined ? false : original[index]!.hasReservation
+    const renewalCount = original[index]!.renewalCount === undefined ? 0 : original[index]!.renewalCount
+    if (typeof hasReservation !== 'boolean' || (renewalCount !== 0 && renewalCount !== 1)) return fail()
+    return { ...book, hasReservation, renewalCount }
+  })
   const locations = rows<LibraryLocation>(source.locations, placeFields)
   if (books.some(book => !['available', 'reserved', 'borrowed', 'returned'].includes(book.status)
     || (book.locationId && !locations.some(place => place.id === book.locationId)))) return fail()

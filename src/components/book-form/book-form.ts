@@ -1,6 +1,6 @@
 import { defineComponent, reactive, toRaw, watch } from 'vue'
 import type { PropType } from 'vue'
-import { statusLabels } from '../../library'
+import { addLoanDays, LOAN_DAYS, statusLabels } from '../../library'
 import type { Book } from '../../library'
 import type { BookFormProps } from './book-form.interface'
 
@@ -15,6 +15,12 @@ export default defineComponent({
   setup(props, { emit }) {
     const form = reactive({ ...props.initial })
     watch(() => props.initial, value => Object.assign(form, value), { deep: true })
+    watch(() => [form.borrowedOn, form.status], () => {
+      if (form.status !== 'borrowed') return
+      form.dueOn = props.initial.status === 'borrowed' && form.borrowedOn === props.initial.borrowedOn
+        ? props.initial.dueOn
+        : addLoanDays(form.borrowedOn, LOAN_DAYS * ((props.initial.status === 'borrowed' ? props.initial.renewalCount ?? 0 : 0) + 1))
+    })
     function submit() { emit('submit', { ...toRaw(form) }) }
     return { form, submit, emit, statusLabels }
   },

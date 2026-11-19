@@ -5,6 +5,7 @@ Vue 3 + TypeScript + Tailwind CSS 個人圖書管理工具。
 - 全部圖書：書名、作者、索書號、館藏地點與閱讀狀態。
 - 已預約清單：記錄預約日期，可登記借出。
 - 已借書與到期日：記錄借書日與到期日，依到期日排序，標示今天到期、三天內到期與逾期，可標記歸還。
+- 新借書的借期為 28 天，到期日自動計算。借閱清單可勾選「有人預約」並儲存，勾選後不能續借；無人預約時最多續借一次，從原到期日延長 28 天。歸還後重新借出會重設續借次數。舊紀錄保留原到期日，缺少的新欄位預設為無人預約、尚未續借。
 - 實際館藏地點：新增、編輯及刪除地點，記錄地址、樓層、書架與備註。已被圖書使用的地點不能刪除。
 
 設定 Supabase 後，每位使用者可用 Email／密碼註冊登入，管理自己獨立的雲端館藏。在其他裝置登入同一帳號即可讀取已儲存的內容。每次進入會讀取最新館藏；已開啟的其他裝置需按「重新讀取」更新清單，目前不提供即時推播或離線編輯。不同裝置同時修改時會阻擋過期版本儲存，保留表單並提示先重新讀取，避免覆寫他人的更新。
@@ -81,4 +82,4 @@ src/
 
 推送到 `main` 會由 GitHub Actions 部署到 https://zheeejun.github.io/collection-register/ （需先在 repo 的 Settings → Pages 將 Source 設為 GitHub Actions）。
 
-`src/collection-register-standalone.html` 是舊版獨立登記工具；新版圖書管理請使用 Vite 網站。舊版獨立 HTML 的 Tailwind 樣式可用 `npm run build:standalone` 重新編譯。
+`src/collection-register-standalone/` 集中存放舊版獨立登記工具：`collection-register-standalone.html` 負責畫面結構，`collection-register-standalone.js` 包含儲存、圖書列操作、地點選單、拖曳排序、複製與復原，`collection-register-standalone.css` 為樣式來源，`icons/` 存放所需 SVG 圖示。HTML 以一般 script 載入 JS，可直接開啟 HTML；搬移或分享時請保留整個資料夾。可用 `npm run build:standalone` 重新編譯樣式並嵌入 HTML。新版圖書管理請使用 Vite 網站。

@@ -12,7 +12,7 @@ const accountB = '00000000-0000-4000-8000-000000000002'
 const empty = () => ({ version: 1, books: [], locations: [] })
 const collection = () => ({
   version: 1,
-  books: [{ id: 'book', title: '跨裝置閱讀', author: '', sn: '001', locationId: 'home', status: 'available', reservedOn: '', borrowedOn: '', dueOn: '', notes: '' }],
+  books: [{ id: 'book', title: '跨裝置閱讀', author: '', sn: '001', locationId: 'home', status: 'available', reservedOn: '', borrowedOn: '', dueOn: '', hasReservation: false, renewalCount: 0, notes: '' }],
   locations: [{ id: 'home', name: '家中', address: '', floor: '', shelf: '', notes: '' }],
 })
 
@@ -27,6 +27,28 @@ test('backup validation rejects invalid snapshots without discarding valid book 
   const duplicate = collection()
   duplicate.books.push({ ...duplicate.books[0] })
   assert.throws(() => parseLibraryData(duplicate), /資料格式不正確/)
+})
+
+test('old snapshots default renewal fields while new snapshots preserve and validate them', () => {
+  const old = collection()
+  old.books[0].dueOn = '2026-12-01'
+  delete old.books[0].hasReservation
+  delete old.books[0].renewalCount
+  const migrated = parseLibraryData(old)
+  assert.equal(migrated.books[0].hasReservation, false)
+  assert.equal(migrated.books[0].renewalCount, 0)
+  assert.equal(migrated.books[0].dueOn, '2026-12-01')
+  const renewed = collection()
+  renewed.books[0].hasReservation = true
+  renewed.books[0].renewalCount = 1
+  assert.deepEqual(parseLibraryData(renewed), renewed)
+  for (const invalid of [2, -1, '1', null]) {
+    renewed.books[0].renewalCount = invalid
+    assert.throws(() => parseLibraryData(renewed), /資料格式不正確/)
+  }
+  renewed.books[0].renewalCount = 0
+  renewed.books[0].hasReservation = 'true'
+  assert.throws(() => parseLibraryData(renewed), /資料格式不正確/)
 })
 
 test('real PostgreSQL enforces account isolation, server-owned revisions and stale-write protection', async t => {

@@ -5,7 +5,16 @@ import ts from 'typescript'
 
 const source = await readFile(new URL('../src/library.ts', import.meta.url), 'utf8')
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 } }).outputText
-const { migrateLegacy, localDate, daysUntil, dueLabel } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`)
+const { migrateLegacy, localDate, daysUntil, dueLabel, addLoanDays } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`)
+
+test('28-day loans use calendar days across leap years and year boundaries', () => {
+  assert.equal(addLoanDays('2026-11-19'), '2026-12-17')
+  assert.equal(addLoanDays('2028-02-01'), '2028-02-29')
+  assert.equal(addLoanDays('2026-12-20'), '2027-01-17')
+  assert.equal(addLoanDays('2026-12-17'), '2027-01-14')
+  assert.equal(addLoanDays('2026-02-30'), '')
+  assert.equal(addLoanDays(''), '')
+})
 
 test('date labels handle overdue, today, month changes and leap years', () => {
   assert.equal(dueLabel('2026-11-12', '2026-11-13'), '逾期 1 天')

@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { build } from 'vite'
 
 const root = fileURLToPath(new URL('../', import.meta.url))
-const htmlPath = new URL('../src/collection-register-standalone.html', import.meta.url)
+const htmlPath = new URL('../src/collection-register-standalone/collection-register-standalone.html', import.meta.url)
 const html = await readFile(htmlPath, 'utf8')
 const stylePattern = /<style id="standalone-tailwind">[\s\S]*?<\/style>/
 if (!stylePattern.test(html)) throw new Error('Missing standalone Tailwind style block')
@@ -16,7 +16,7 @@ const result = await build({
   build: {
     write: false,
     rollupOptions: {
-      input: fileURLToPath(new URL('../src/collection-register-standalone.css', import.meta.url)),
+      input: fileURLToPath(new URL('../src/collection-register-standalone/collection-register-standalone.css', import.meta.url)),
     },
   },
 })

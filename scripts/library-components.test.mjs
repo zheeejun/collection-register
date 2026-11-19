@@ -76,6 +76,57 @@ test('editor rejects duplicate locations and keeps the editor open after a faile
   assert.equal(store.data.value.books[0].title, book.title)
 })
 
+test('checkout calculates 28 days and resets renewal state on a new loan', async () => {
+  const store = fixture()
+  const editor = useLibraryEditor(store, ref('borrowed'))
+  editor.editBook()
+  assert.equal(editor.bookForm.dueOn, '2026-12-11')
+  editor.prepareBorrow({ ...book, status: 'returned', hasReservation: true, renewalCount: 1 })
+  assert.equal(editor.bookForm.hasReservation, false)
+  assert.equal(editor.bookForm.renewalCount, 0)
+  assert.equal(editor.bookForm.dueOn, '2026-12-11')
+  await editor.submitBook({ ...toRaw(editor.bookForm), dueOn: '2027-12-31' })
+  assert.equal(store.data.value.books[0].dueOn, '2026-12-11')
+  assert.equal(store.data.value.books[0].renewalCount, 0)
+})
+
+test('a reservation blocks renewal; clearing it permits exactly one 28-day extension', async () => {
+  const store = fixture()
+  store.data.value.books[0] = { ...book, status: 'borrowed', borrowedOn: '2026-11-01', dueOn: '2026-11-29', hasReservation: false, renewalCount: 0 }
+  const editor = useLibraryEditor(store, ref('borrowed'))
+  const staleBook = structuredClone(toRaw(store.data.value.books[0]))
+  await editor.setReservation({ id: book.id, hasReservation: true })
+  await editor.renewBook(staleBook)
+  assert.match(store.error.value, /有人預約/)
+  assert.equal(store.data.value.books[0].dueOn, '2026-11-29')
+  await editor.setReservation({ id: book.id, hasReservation: false })
+  await editor.renewBook(staleBook)
+  assert.equal(store.data.value.books[0].dueOn, '2026-12-27')
+  assert.equal(store.data.value.books[0].renewalCount, 1)
+  await editor.renewBook(staleBook)
+  assert.match(store.error.value, /已續借一次/)
+  assert.equal(store.data.value.books[0].dueOn, '2026-12-27')
+  // Editing metadata cannot clear the stored renewal count or extend a due date.
+  await editor.submitBook({ ...toRaw(store.data.value.books[0]), renewalCount: 0, dueOn: '2028-01-01', title: '修改書名' })
+  assert.equal(store.data.value.books[0].renewalCount, 1)
+  assert.equal(store.data.value.books[0].dueOn, '2026-12-27')
+})
+
+test('failed saves retain reservation, renewal count and dates; returned books cannot renew', async () => {
+  const store = fixture()
+  store.data.value.books[0] = { ...book, status: 'borrowed', borrowedOn: '2026-11-01', dueOn: '2026-11-29', hasReservation: false, renewalCount: 0 }
+  store.commit = async () => false
+  const editor = useLibraryEditor(store, ref('borrowed'))
+  await editor.setReservation({ id: book.id, hasReservation: true })
+  assert.equal(store.data.value.books[0].hasReservation, false)
+  await editor.renewBook(store.data.value.books[0])
+  assert.equal(store.data.value.books[0].renewalCount, 0)
+  assert.equal(store.data.value.books[0].dueOn, '2026-11-29')
+  store.data.value.books[0].status = 'returned'
+  await editor.renewBook(store.data.value.books[0])
+  assert.match(store.error.value, /只有借閱中/)
+})
+
 // Middleware mode compiles the actual external script/style components without opening a port.
 const server = await createServer({ server: { middlewareMode: true }, appType: 'custom' })
 after(() => server.close())
@@ -107,4 +158,22 @@ test('auth forms render login and password recovery with appropriate browser aut
   assert.match(recovery, /設定新密碼/)
   assert.match(recovery, /autocomplete="new-password"/)
   assert.doesNotMatch(recovery, /type="email"/)
+})
+
+test('borrowed forms and lists expose the reservation checkbox and disable prohibited renewal', async () => {
+  const { default: BookForm } = await server.ssrLoadModule('/src/components/book-form/book-form.vue')
+  const borrowed = { ...book, status: 'borrowed', borrowedOn: '2026-11-01', dueOn: '2026-11-29', hasReservation: true, renewalCount: 0 }
+  const form = await renderToString(createSSRApp(BookForm, { initial: borrowed, locations: [location] }))
+  assert.match(form, /<input\b(?=[^>]*type="checkbox")(?=[^>]*\bchecked\b)[^>]*>/)
+  assert.match(form, /type="date"[^>]*readonly/)
+  const { default: BookTable } = await server.ssrLoadModule('/src/components/book-table/book-table.vue')
+  const render = books => renderToString(createSSRApp(BookTable, { books, locations: [location], page: 'borrowed', today: '2026-11-13' }))
+  const reserved = await render([borrowed])
+  assert.match(reserved, /disabled[^>]*title="有人預約，不能續借"/)
+  const renewed = await render([{ ...borrowed, hasReservation: false, renewalCount: 1 }])
+  assert.match(renewed, /disabled[^>]*title="已續借一次，不能再次續借"/)
+  const available = await render([{ ...borrowed, hasReservation: false }])
+  const renewalButton = available.match(/<button\b[^>]*title="從原到期日延長 28 天"[^>]*>/)?.[0]
+  assert.ok(renewalButton)
+  assert.doesNotMatch(renewalButton, /\bdisabled\b/)
 })

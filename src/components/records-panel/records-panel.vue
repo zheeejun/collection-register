@@ -69,6 +69,8 @@
           :saving="saving"
           @borrow="emit('borrow', $event)"
           @return="emit('return', $event)"
+          @renew="emit('renew', $event)"
+          @reservation="emit('reservation', $event)"
           @edit="emit('edit-book', $event)"
           @delete="emit('delete-book', $event)"
         />

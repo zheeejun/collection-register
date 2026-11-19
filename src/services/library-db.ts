@@ -1,5 +1,6 @@
 import { migrateLegacy } from '../library'
 import type { LibraryData } from '../library'
+import { parseLibraryData } from './library-backup'
 
 let database: IDBDatabase | undefined
 function openDatabase(): Promise<IDBDatabase> {
@@ -36,7 +37,7 @@ export async function loadLibrary(): Promise<LibraryData> {
     transaction.onerror = () => reject(transaction.error)
     transaction.onabort = () => reject(transaction.error)
   })
-  if (data) return data
+  if (data) return parseLibraryData(data)
   const migrated = migrateLegacy(localStorage.getItem('collection-register-vue-v1'))
   await saveLibrary(migrated)
   return migrated

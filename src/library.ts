@@ -1,4 +1,4 @@
-import type { BookStatus, LibraryData } from './models/library.interface'
+import type { Book, BookStatus, LibraryData } from './models/library.interface'
 export type { BookStatus, Book, LibraryData, LibraryLocation } from './models/library.interface'
 
 export const statusLabels: Record<BookStatus, string> = {
@@ -9,6 +9,21 @@ export function localDate(date = new Date()) {
 }
 export function daysUntil(date: string, today = localDate()) {
   return Math.round((Date.parse(`${date}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86400000)
+}
+export const LOAN_DAYS = 28
+export function addLoanDays(date: string, days = LOAN_DAYS) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return ''
+  const value = new Date(`${date}T00:00:00Z`)
+  if (!Number.isFinite(value.getTime()) || value.toISOString().slice(0, 10) !== date) return ''
+  value.setUTCDate(value.getUTCDate() + days)
+  return value.toISOString().slice(0, 10)
+}
+export function renewalBlockReason(book: Book) {
+  if (book.status !== 'borrowed') return '只有借閱中的圖書可以續借'
+  if (book.hasReservation) return '有人預約，不能續借'
+  if ((book.renewalCount ?? 0) >= 1) return '已續借一次，不能再次續借'
+  if (!addLoanDays(book.dueOn)) return '請先設定有效的到期日'
+  return ''
 }
 export function dueLabel(date: string, today = localDate()) {
   const days = daysUntil(date, today)
@@ -33,7 +48,7 @@ export function migrateLegacy(raw: string | null): LibraryData {
     result.books.push({
       id: crypto.randomUUID(), title: String(row.title ?? ''), author: '', sn: String(row.sn ?? ''),
       locationId: result.locations.find(place => place.name === String(row.loc ?? '').trim())?.id ?? '',
-      status: 'available', reservedOn: '', borrowedOn: '', dueOn: '', notes: '',
+      status: 'available', reservedOn: '', borrowedOn: '', dueOn: '', hasReservation: false, renewalCount: 0, notes: '',
     })
   }
   return result

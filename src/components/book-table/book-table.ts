@@ -1,6 +1,6 @@
 import { defineComponent } from 'vue'
 import type { PropType } from 'vue'
-import { daysUntil, dueLabel, statusLabels } from '../../library'
+import { daysUntil, dueLabel, renewalBlockReason, statusLabels } from '../../library'
 import type { Book } from '../../library'
 import type { BookTableProps } from './book-table.interface'
 
@@ -16,6 +16,8 @@ export default defineComponent({
   emits: {
     borrow: (book: Book) => !!book,
     return: (book: Book) => !!book,
+    renew: (book: Book) => !!book,
+    reservation: (value: { id: string; hasReservation: boolean }) => !!value.id,
     edit: (book: Book) => !!book,
     delete: (book: Book) => !!book,
   },
@@ -25,6 +27,12 @@ export default defineComponent({
       const place = props.locations.find(item => item.id === id)
       return place ? [place.floor, place.shelf].filter(Boolean).join(' · ') : ''
     }
-    return { emit, locationName, locationDetail, daysUntil, dueLabel, statusLabels }
+    function changeReservation(book: Book, event: Event) {
+      const input = event.target as HTMLInputElement
+      emit('reservation', { id: book.id, hasReservation: input.checked })
+      // Keep the checkbox at its saved value until the database confirms the change.
+      input.checked = !!book.hasReservation
+    }
+    return { emit, locationName, locationDetail, daysUntil, dueLabel, renewalBlockReason, statusLabels, changeReservation }
   },
 })

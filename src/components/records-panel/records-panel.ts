@@ -31,6 +31,8 @@ export default defineComponent({
     'update:dueFilter': (value: string) => typeof value === 'string',
     'add-book': () => true, 'add-location': () => true, share: () => true,
     borrow: (book: Book) => !!book, return: (book: Book) => !!book,
+    renew: (book: Book) => !!book,
+    reservation: (value: { id: string; hasReservation: boolean }) => !!value.id,
     'edit-book': (book: Book) => !!book, 'delete-book': (book: Book) => !!book,
     'edit-location': (place: LibraryLocation) => !!place, 'delete-location': (place: LibraryLocation) => !!place,
   },

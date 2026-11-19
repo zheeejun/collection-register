@@ -16,7 +16,7 @@
         借閱人
         <select class="cursor-pointer" v-model="form.author">
           <option value="">請選擇借閱人</option>
-          <option value="Js">Jessie</option>
+          <option value="Jessie">Jessie</option>
           <option value="Yang">Yang</option>
           <option value="Fong">Fong</option>
         </select>
@@ -57,8 +57,13 @@
         <label>
           到期日
           <span class="required">*</span>
-          <input v-model="form.dueOn" type="date" required :min="form.borrowedOn || undefined">
+          <input v-model="form.dueOn" type="date" required readonly>
         </label>
+        <label class="reservation-checkbox full-width">
+          <input v-model="form.hasReservation" type="checkbox" :disabled="saving">
+          有人預約，不能續借
+        </label>
+        <p class="form-help full-width">借期 28 天，最多續借一次；續借從原到期日延長 28 天。目前已續借 {{ form.renewalCount || 0 }} 次。</p>
       </template>
       <label class="full-width">
         備註

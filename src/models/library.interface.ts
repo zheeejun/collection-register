@@ -19,6 +19,8 @@ export interface Book {
   reservedOn: string
   borrowedOn: string
   dueOn: string
+  hasReservation: boolean
+  renewalCount: 0 | 1
   notes: string
 }
 
