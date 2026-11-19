@@ -1,0 +1,23 @@
+.editor-panel {
+  background: white;
+  border: 1px solid #b9b1d7;
+  border-radius: 11px;
+  overflow: hidden;
+  padding-bottom: 24px;
+  margin-bottom: 25px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  padding: 0 24px;
+}
+
+.form-grid :deep(.full-width) { grid-column: 1 / -1; }
+.form-grid :deep(.form-help) { align-self: end; color: #a46039; font-size: 12px; }
+.form-actions { display: flex; gap: 10px; }
+
+@media (max-width: 520px) {
+  .form-grid { grid-template-columns: 1fr; padding-inline: 15px; }
+}

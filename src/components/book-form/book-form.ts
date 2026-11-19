@@ -3,9 +3,11 @@ import type { PropType } from 'vue'
 import { addLoanDays, LOAN_DAYS, statusLabels } from '../../library'
 import type { Book } from '../../library'
 import type { BookFormProps } from './book-form.interface'
+import { LiCheckbox, LiForm, LiFormField, LiInput, LiSelect, LiTextarea } from '../index'
 
 export default defineComponent({
   name: 'BookForm',
+  components: { LiCheckbox, LiForm, LiFormField, LiInput, LiSelect, LiTextarea },
   props: {
     initial: { type: Object as PropType<BookFormProps['initial']>, required: true },
     locations: { type: Array as PropType<BookFormProps['locations']>, required: true },

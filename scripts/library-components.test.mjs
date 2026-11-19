@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
+import { readFile } from 'node:fs/promises'
 import { after, test } from 'node:test'
-import { createSSRApp, ref, toRaw } from 'vue'
+import { createRenderer, createSSRApp, h, nextTick, ref, toRaw } from 'vue'
 import { renderToString } from '@vue/server-renderer'
 import { createServer } from 'vite'
 import { loadTypeScript } from './load-typescript.mjs'
@@ -176,4 +177,62 @@ test('borrowed forms and lists expose the reservation checkbox and disable prohi
   const renewalButton = available.match(/<button\b[^>]*title="從原到期日延長 28 天"[^>]*>/)?.[0]
   assert.ok(renewalButton)
   assert.doesNotMatch(renewalButton, /\bdisabled\b/)
+})
+
+test('shared controls forward native form attributes and render through their public exports', async () => {
+  const { LiCheckbox, LiForm, LiFormField, LiInput, LiSelect, LiTextarea } = await server.ssrLoadModule('/src/components/index.ts')
+  const html = await renderToString(createSSRApp({ render: () => h(LiForm, { title: 'Shared form', label: 'Test form', submitLabel: 'Save', saving: true }, {
+    default: () => [
+      h(LiFormField, { label: 'Date', required: true }, { default: () => h(LiInput, { modelValue: '2026-11-19', type: 'date', required: true, readonly: true, name: 'date' }) }),
+      h(LiSelect, { modelValue: 'one', name: 'place', required: true }, { default: () => h('option', { value: 'one' }, 'One') }),
+      h(LiTextarea, { modelValue: 'Notes', rows: 2, maxlength: 2000, name: 'notes' }),
+      h(LiCheckbox, { modelValue: true, class: 'full-width', id: 'reservation', name: 'reservation', disabled: true, 'aria-label': 'Reserved', label: 'Reserved' }),
+    ],
+  }) }))
+  assert.match(html, /aria-busy="true"/)
+  assert.match(html, /<input\b(?=[^>]*name="date")(?=[^>]*required)(?=[^>]*readonly)[^>]*>/)
+  assert.match(html, /<select\b(?=[^>]*name="place")(?=[^>]*required)[^>]*>/)
+  assert.match(html, /<textarea\b[^>]*name="notes"[^>]*>Notes<\/textarea>/)
+  assert.match(html, /<label\b[^>]*class="li-checkbox full-width"/)
+  assert.match(html, /<input\b(?=[^>]*id="reservation")(?=[^>]*disabled)(?=[^>]*aria-label="Reserved")(?=[^>]*checked)[^>]*>/)
+  assert.match(html, /<button type="submit"[^>]*disabled/)
+})
+
+test('shared checkbox follows parent updates and rolls back a change the parent does not accept', async () => {
+  const { default: checkbox } = await server.ssrLoadModule('/src/components/li-checkbox/li-checkbox.ts')
+  const { compile } = await import('@vue/compiler-dom')
+  const source = await readFile(new URL('../src/components/li-checkbox/li-checkbox.vue', import.meta.url), 'utf8')
+  const template = source.match(/<template>([\s\S]*?)<\/template>/)[1]
+  const render = new Function('Vue', compile(template, { mode: 'function', prefixIdentifiers: true }).code)(await import('vue'))
+  const LiCheckbox = { ...checkbox, render }
+  const host = createRenderer({
+    createElement: tag => ({ tag, children: [], props: {} }),
+    createText: text => ({ text }), createComment: text => ({ text }),
+    insert(child, parent) { parent.children.push(child) }, remove() {},
+    setText(node, text) { node.text = text }, setElementText(node, text) { node.text = text },
+    patchProp(node, key, _old, value) { node.props[key] = value; node[key] = value },
+    parentNode: () => null, nextSibling: () => null,
+  })
+  const value = ref(false)
+  let accept = false
+  const updates = []
+  const app = host.createApp({ render: () => h(LiCheckbox, {
+    modelValue: value.value,
+    'onUpdate:modelValue': checked => { updates.push(checked); if (accept) value.value = checked },
+  }) })
+  const root = { children: [] }
+  app.mount(root)
+  const input = root.children[0].children.find(node => node.tag === 'input')
+  input.checked = true
+  input.props.onChange({ target: input })
+  await nextTick()
+  assert.deepEqual(updates, [true])
+  assert.equal(input.checked, false)
+  accept = true
+  input.checked = true
+  input.props.onChange({ target: input })
+  await nextTick()
+  assert.equal(value.value, true)
+  assert.equal(input.checked, true)
+  app.unmount()
 })

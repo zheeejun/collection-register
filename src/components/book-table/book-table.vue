@@ -68,10 +68,7 @@
                 登記借出
               </button>
               <template v-else>
-                <label class="reservation-toggle">
-                  <input type="checkbox" :checked="!!book.hasReservation" :disabled="saving" :aria-label="`${book.title} 有人預約，不能續借`" @change="changeReservation(book, $event)">
-                  有人預約
-                </label>
+                <LiCheckbox class="reservation-toggle" :model-value="!!book.hasReservation" :disabled="saving" :aria-label="`${book.title} 有人預約，不能續借`" label="有人預約" @change="changeReservation(book, $event)" />
                 <button class="text-button" :disabled="saving || !!renewalBlockReason(book)" :title="renewalBlockReason(book) || '從原到期日延長 28 天'" @click="emit('renew', book)">續借 28 天</button>
                 <span class="table-muted">{{ renewalBlockReason(book) || '可續借一次' }}</span>
                 <button class="text-button" :disabled="saving" @click="emit('return', book)">標記歸還</button>

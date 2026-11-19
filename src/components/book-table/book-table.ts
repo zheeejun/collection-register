@@ -3,9 +3,11 @@ import type { PropType } from 'vue'
 import { daysUntil, dueLabel, renewalBlockReason, statusLabels } from '../../library'
 import type { Book } from '../../library'
 import type { BookTableProps } from './book-table.interface'
+import { LiCheckbox } from '../index'
 
 export default defineComponent({
   name: 'BookTable',
+  components: { LiCheckbox },
   props: {
     books: { type: Array as PropType<BookTableProps['books']>, required: true },
     locations: { type: Array as PropType<BookTableProps['locations']>, required: true },

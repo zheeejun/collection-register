@@ -55,6 +55,13 @@ src/
     app.interface.ts        # 頁面介面
     app.navigation.ts       # 分頁與篩選狀態
   components/
+    index.ts                # LiForm、LiFormField、LiInput、LiSelect、LiTextarea、LiCheckbox 共用元件 exports
+    li-form/                # 共用編輯表單外框、送出／取消與儲存狀態
+    li-form-field/          # 欄位標籤與必填標記
+    li-input/               # 文字、日期、Email、密碼輸入
+    li-select/              # 單選下拉選單，選項由 slot 提供
+    li-textarea/            # 多行文字
+    li-checkbox/            # 布林值勾選與原生 input 屬性傳遞
     appbutton/
       appbutton.vue         # HTML template
       appbutton.ts          # props、事件與元件邏輯
@@ -79,6 +86,8 @@ src/
 ```
 
 各元件透過 `<script lang="ts" src="./元件.ts">` 和 `<style scoped src="./元件.css">` 載入同資料夾檔案。表單使用本機草稿，送出後由應用層驗證並儲存，不直接修改館藏紀錄。原有的分享及舊版登記元件沿用原本結構，`AppButton` 已移到 `components/appbutton/`。
+
+共用表單控制項可從 `src/components/index.ts` 匯入，例如 `import { LiCheckbox, LiForm, LiInput } from '../index'`。`LiInput`、`LiSelect`、`LiTextarea` 使用字串 `v-model`；`LiCheckbox` 使用布林值 `v-model`，並將 `disabled`、`required`、`name`、`id`、`aria-*` 等屬性傳給原生 input，`class` 與 `style` 則套用在外層 label。圖書與地點表單共用 `LiForm` 與 `LiFormField`，借閱規則與資料儲存仍由原有 composables 處理。
 
 推送到 `main` 會由 GitHub Actions 部署到 https://zheeejun.github.io/collection-register/ （需先在 repo 的 Settings → Pages 將 Source 設為 GitHub Actions）。
 

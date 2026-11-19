@@ -8,10 +8,10 @@
       <p>登入同一帳號，在手機與電腦管理自己的圖書。</p>
       <form @submit.prevent="submit">
         <label v-if="!recovery">Email
-          <input v-model.trim="email" type="email" autocomplete="email" required :disabled="busy" />
+          <LiInput v-model.trim="email" type="email" autocomplete="email" required :disabled="busy" />
         </label>
         <label v-if="recovery || mode !== 'reset'">{{ recovery ? '新密碼' : '密碼' }}
-          <input v-model="password" type="password" :autocomplete="recovery || mode === 'signup' ? 'new-password' : 'current-password'" :minlength="recovery || mode === 'signup' ? 8 : undefined" required :disabled="busy" />
+          <LiInput v-model="password" type="password" :autocomplete="recovery || mode === 'signup' ? 'new-password' : 'current-password'" :minlength="recovery || mode === 'signup' ? 8 : undefined" required :disabled="busy" />
           <small v-if="recovery || mode === 'signup'">請使用至少 8 個字元。</small>
         </label>
         <p v-if="error" class="auth-error" role="alert">{{ error }}</p>
