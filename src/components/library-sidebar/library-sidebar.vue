@@ -37,9 +37,9 @@
     </div>
     <div class="storage-note">
       <span class="storage-dot"></span>
-      本機資料庫 ·
+      {{ cloud ? '雲端館藏' : '本機資料庫' }} ·
       {{ saving ? '儲存中' : loading ? '讀取中' : fatalError ? '無法連線' : '已就緒' }}
-      <small>資料保存在此瀏覽器，請定期匯出備份。</small>
+      <small>{{ cloud ? '已儲存的資料可跨裝置讀取。其他裝置修改後，請按「重新讀取」。' : '資料保存在此瀏覽器，請定期匯出備份。' }}</small>
     </div>
   </aside>
 </template>

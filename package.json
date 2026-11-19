@@ -4,17 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test": "node --test scripts/library.test.mjs scripts/library-components.test.mjs",
+    "test": "node --test scripts/library.test.mjs scripts/library-components.test.mjs scripts/cloud-library.test.mjs scripts/auth.test.mjs",
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "build:standalone": "node scripts/build-standalone.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.1",
     "vue": "^3.5.44",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
     "@tailwindcss/vite": "^4.3.4",
     "@types/node": "^24.19.2",
     "@vitejs/plugin-vue": "^6.0.10",

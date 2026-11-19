@@ -5,5 +5,6 @@ export interface LibrarySidebarProps {
   counts: Record<Page, number>
   loading?: boolean
   saving?: boolean
+  cloud?: boolean
   fatalError?: string
 }

@@ -55,6 +55,14 @@
   white-space: nowrap;
 }
 
+.account-actions, .library-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.account-actions { justify-content: flex-end; overflow-wrap: anywhere; }
+.import-panel { margin-bottom: 24px; padding: 20px; border: 1px solid #d9d4ee; border-radius: 8px; background: #f0edf9; }
+.import-panel h2 { margin: 0; font-size: 16px; }
+.import-panel p { margin: 8px 0 16px; }
+.backup-label { display: grid; gap: 4px; font-size: 12px; max-width: 100%; }
+.backup-label input { max-width: 100%; }
+
 .page-heading {
   display: flex;
   align-items: center;

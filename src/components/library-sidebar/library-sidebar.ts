@@ -10,6 +10,7 @@ export default defineComponent({
     counts: { type: Object as PropType<LibrarySidebarProps['counts']>, required: true },
     loading: Boolean,
     saving: Boolean,
+    cloud: Boolean,
     fatalError: { type: String, default: '' },
   },
   setup() { return { pages } },

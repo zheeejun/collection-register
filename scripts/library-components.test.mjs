@@ -96,3 +96,15 @@ test('split components render real form values and due dates from their external
   assert.match(table, /3F · A12/)
   assert.match(table, /標記歸還/)
 })
+
+test('auth forms render login and password recovery with appropriate browser autofill', async () => {
+  const { default: AuthPanel } = await server.ssrLoadModule('/src/components/auth-panel/auth-panel.vue')
+  const login = await renderToString(createSSRApp(AuthPanel))
+  assert.match(login, /type="email"/)
+  assert.match(login, /autocomplete="current-password"/)
+  assert.match(login, /忘記密碼/)
+  const recovery = await renderToString(createSSRApp(AuthPanel, { recovery: true }))
+  assert.match(recovery, /設定新密碼/)
+  assert.match(recovery, /autocomplete="new-password"/)
+  assert.doesNotMatch(recovery, /type="email"/)
+})
