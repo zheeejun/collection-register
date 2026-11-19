@@ -28,7 +28,7 @@ Vue 3 + TypeScript + Tailwind CSS 個人圖書管理工具。
 1. 在 [Supabase](https://supabase.com/dashboard) 建立專案。在 SQL Editor 執行 [`supabase/migrations/202611190001_libraries.sql`](supabase/migrations/202611190001_libraries.sql) 一次，建立館藏資料表、每人獨立的 RLS 權限與儲存版本檢查。
 2. 在專案的 Connect／API Keys 找到 Project URL 與 **Publishable key**（舊版 anon key 也可）。不要使用 secret key 或 service_role key，也不要把資料庫密碼放進網站。
 3. 本機開發：參照 `.env.example`，在既有 `.env.local` 加入 `VITE_SUPABASE_URL` 與 `VITE_SUPABASE_PUBLISHABLE_KEY`，保留原本的網站網址設定，再重啟 `npm run dev`。
-4. 正式網站：在 GitHub repository → Settings → Secrets and variables → Actions → **Variables** 加入同名的兩個 repository variables。它們會公開在前端程式中，資料隔離由 RLS 與使用者的登入憑證負責。修改變數後必須重新執行部署才會生效。
+4. 正式網站：GitHub Actions 已設定此專案的 Supabase 網址與公開金鑰。若要切換專案，可在 GitHub repository → Settings → Secrets and variables → Actions → **Variables** 加入 `VITE_SUPABASE_URL` 與 `VITE_SUPABASE_PUBLISHABLE_KEY`，覆寫預設值。它們會公開在前端程式中，資料隔離由 RLS 與使用者的登入憑證負責。修改設定後必須重新執行部署才會生效。
 5. 在 Supabase Authentication → URL Configuration 將 Site URL 設為 `https://zheeejun.github.io/collection-register/`，並在 Redirect URLs 加入相同網址。本機測試再加入實際使用的開發網址，例如 `http://localhost:5173/`。
 6. 在 Authentication 啟用 Email／密碼及 Email 驗證；密碼最小長度設為至少 8。要開放其他人註冊與收驗證／重設密碼信，請設定可寄給一般使用者的 **Custom SMTP**，Supabase 預設寄信服務限制收件者與寄信量，僅適合測試。
 7. 推送程式到 `main` 後由 GitHub Actions 執行測試、建置及部署。只有一個雲端變數或網址格式錯誤時會顯示設定錯誤，避免誤以為正在同步。
