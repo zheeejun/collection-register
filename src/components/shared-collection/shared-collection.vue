@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SharedCollection } from '../share'
+import type { SharedCollection } from '../../share'
 
 defineProps<{ collection: SharedCollection | null; error: string }>()
 </script>

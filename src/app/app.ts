@@ -1,11 +1,12 @@
+import { LiButton } from '../li-components'
 import { defineComponent, watch } from 'vue'
 import LibrarySidebar from '../components/library-sidebar/library-sidebar.vue'
 import LibraryStats from '../components/library-stats/library-stats.vue'
 import BookForm from '../components/book-form/book-form.vue'
 import LocationForm from '../components/location-form/location-form.vue'
 import RecordsPanel from '../components/records-panel/records-panel.vue'
-import SharedCollection from '../components/SharedCollection.vue'
-import ShareLinkDialog from '../components/ShareLinkDialog.vue'
+import SharedCollection from '../components/shared-collection/shared-collection.vue'
+import ShareLinkDialog from '../components/share-link-dialog/share-link-dialog.vue'
 import { useLibraryNavigation } from './app.navigation'
 import { useLibraryStore } from '../composables/useLibraryStore'
 import { useLibraryCatalog } from '../composables/useLibraryCatalog'
@@ -16,7 +17,7 @@ export default defineComponent({
   name: 'LibraryApp',
   props: { userId: String, email: String },
   emits: ['sign-out'],
-  components: { LibrarySidebar, LibraryStats, BookForm, LocationForm, RecordsPanel, SharedCollection, ShareLinkDialog },
+  components: { LiButton, LibrarySidebar, LibraryStats, BookForm, LocationForm, RecordsPanel, SharedCollection, ShareLinkDialog },
   setup(props, { emit }) {
     const isSharedView = window.location.hash.startsWith('#share=')
     const navigation = useLibraryNavigation(!isSharedView)

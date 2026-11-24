@@ -180,7 +180,7 @@ test('borrowed forms and lists expose the reservation checkbox and disable prohi
 })
 
 test('shared controls forward native form attributes and render through their public exports', async () => {
-  const { LiCheckbox, LiForm, LiFormField, LiInput, LiSelect, LiTextarea } = await server.ssrLoadModule('/src/components/index.ts')
+  const { LiCheckbox, LiForm, LiFormField, LiInput, LiSelect, LiTextarea } = await server.ssrLoadModule('/src/li-components/index.ts')
   const html = await renderToString(createSSRApp({ render: () => h(LiForm, { title: 'Shared form', label: 'Test form', submitLabel: 'Save', saving: true }, {
     default: () => [
       h(LiFormField, { label: 'Date', required: true }, { default: () => h(LiInput, { modelValue: '2026-11-19', type: 'date', required: true, readonly: true, name: 'date' }) }),
@@ -198,10 +198,24 @@ test('shared controls forward native form attributes and render through their pu
   assert.match(html, /<button type="submit"[^>]*disabled/)
 })
 
+test('shared feedback, icon buttons and icons render from the common entry point', async () => {
+  const { LiToast, LiIconButton, DragHandleIcon, ChevronDownIcon } = await server.ssrLoadModule('/src/li-components/index.ts')
+  const render = (component, props, slots) => renderToString(createSSRApp({ render: () => h(component, props, slots) }))
+  const toast = await render(LiToast, { msg: '已儲存', canUndo: true })
+  assert.match(toast, /role="status"/)
+  assert.match(toast, /已儲存/)
+  assert.match(toast.replace(/<!--[\s\S]*?-->/g, ''), /<button\b[^>]*>復原<\/button>/)
+  assert.doesNotMatch(await render(LiToast, {}), /role="status"/)
+  const iconButton = await render(LiIconButton, { disabled: true, 'aria-label': '刪除', title: '刪除這一列' }, { default: () => h(DragHandleIcon) })
+  assert.match(iconButton, /<button\b(?=[^>]*disabled)(?=[^>]*aria-label="刪除")(?=[^>]*title="刪除這一列")[^>]*>/)
+  assert.match(iconButton, /<svg\b/)
+  assert.match(await render(ChevronDownIcon, {}), /<svg\b/)
+})
+
 test('shared checkbox follows parent updates and rolls back a change the parent does not accept', async () => {
-  const { default: checkbox } = await server.ssrLoadModule('/src/components/li-checkbox/li-checkbox.ts')
+  const { default: checkbox } = await server.ssrLoadModule('/src/li-components/li-checkbox/li-checkbox.ts')
   const { compile } = await import('@vue/compiler-dom')
-  const source = await readFile(new URL('../src/components/li-checkbox/li-checkbox.vue', import.meta.url), 'utf8')
+  const source = await readFile(new URL('../src/li-components/li-checkbox/li-checkbox.vue', import.meta.url), 'utf8')
   const template = source.match(/<template>([\s\S]*?)<\/template>/)[1]
   const render = new Function('Vue', compile(template, { mode: 'function', prefixIdentifiers: true }).code)(await import('vue'))
   const LiCheckbox = { ...checkbox, render }

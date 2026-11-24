@@ -1,0 +1,10 @@
+/* Standalone styles; imported by collection-register-standalone.css. */
+@layer components {
+  .opt { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; color: var(--muted); cursor: pointer; }
+
+  .opt input { width: 16px; height: 16px; accent-color: var(--accent); margin: 0; }
+
+  @media (max-width: 720px) {
+    .opt { flex-basis: 100%; order: 5; }
+  }
+}

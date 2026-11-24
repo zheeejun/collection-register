@@ -1,9 +1,11 @@
+import { LiButton } from '../../li-components'
 import { defineComponent } from 'vue'
 import type { PropType } from 'vue'
 import type { LibraryLocation } from '../../library'
 import type { LocationListProps } from './location-list.interface'
 
 export default defineComponent({
+  components: { LiButton },
   name: 'LocationList',
   props: {
     locations: { type: Array as PropType<LocationListProps['locations']>, required: true },

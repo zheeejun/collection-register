@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /** 工具列。「全部清空」要按兩次，第二次才發出 clear。 */
 import { ref } from 'vue'
-import AppButton from './appbutton/appbutton.vue'
+import { LiButton } from '../../li-components'
 
 const props = defineProps<{ empty: boolean; sharing?: boolean }>()
 const emit = defineEmits<{
@@ -29,13 +29,13 @@ function onClear() {
 
 <template>
   <div class="mt-5 mb-3 flex flex-wrap items-center gap-2">
-    <AppButton variant="primary" @click="emit('add')">＋ 新增一列</AppButton>
-    <AppButton title="以 Tab 分隔（書名、館藏地點、序號），可直接貼到 Excel" @click="emit('copy')">複製全部</AppButton>
-    <AppButton :disabled="empty || sharing" title="產生目前館藏資料的唯讀分享網址" @click="emit('share')">{{ sharing ? '產生中…' : '分享網址' }}</AppButton>
+    <li-button variant="primary" @click="emit('add')">＋ 新增一列</li-button>
+    <li-button title="以 Tab 分隔（書名、館藏地點、序號），可直接貼到 Excel" @click="emit('copy')">複製全部</li-button>
+    <li-button :disabled="empty || sharing" title="產生目前館藏資料的唯讀分享網址" @click="emit('share')">{{ sharing ? '產生中…' : '分享網址' }}</li-button>
     <label class="inline-flex cursor-pointer items-center gap-2 text-sm text-muted max-[720px]:order-5 max-[720px]:basis-full"><input v-model="inc" type="checkbox" class="m-0 size-4 accent-accent" /> 複製列時，序號自動 +1</label>
     <span class="flex-1 max-[720px]:hidden" />
-    <AppButton variant="quiet" :armed="armed" @click="onClear">
+    <li-button variant="quiet" :armed="armed" @click="onClear">
       {{ armed ? '再按一次清空全部' : '全部清空' }}
-    </AppButton>
+    </li-button>
   </div>
 </template>

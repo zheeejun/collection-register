@@ -1,6 +1,1 @@
-export { default as LiForm } from './li-form/li-form.vue'
-export { default as LiFormField } from './li-form-field/li-form-field.vue'
-export { default as LiInput } from './li-input/li-input.vue'
-export { default as LiSelect } from './li-select/li-select.vue'
-export { default as LiTextarea } from './li-textarea/li-textarea.vue'
-export { default as LiCheckbox } from './li-checkbox/li-checkbox.vue'
+export * from '../li-components'

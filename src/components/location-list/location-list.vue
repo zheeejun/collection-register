@@ -24,8 +24,8 @@
       </dl>
       <p v-if="place.notes" class="record-note">{{ place.notes }}</p>
       <div class="card-actions">
-        <button class="text-button" :disabled="saving" @click="emit('edit', place)">編輯地點</button>
-        <button class="text-button danger-text" :disabled="saving" @click="emit('delete', place)">刪除</button>
+        <li-button variant="plain" class="text-button" :disabled="saving" @click="emit('edit', place)">編輯地點</li-button>
+        <li-button variant="plain" class="text-button danger-text" :disabled="saving" @click="emit('delete', place)">刪除</li-button>
       </div>
     </article>
   </div>

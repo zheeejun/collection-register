@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { LiButton } from '../../li-components'
 /**
  * 館藏地點輸入框 + 可自行增刪的下拉清單。
  *
@@ -24,7 +25,7 @@ const emit = defineEmits<{
 }>()
 
 const inputEl = ref<HTMLInputElement | null>(null)
-const chevEl = ref<HTMLButtonElement | null>(null)
+const chevEl = ref<InstanceType<typeof LiButton> | null>(null)
 const menuEl = ref<HTMLElement | null>(null)
 
 const open = ref(false)
@@ -139,7 +140,7 @@ function onKeydown(e: KeyboardEvent) {
 /* 只在選單打開時才監聽全域事件，列數多時不會拖慢頁面 */
 function onDocPointerDown(e: PointerEvent) {
   const t = e.target as Node
-  if (menuEl.value?.contains(t) || inputEl.value?.contains(t) || chevEl.value?.contains(t)) return
+  if (menuEl.value?.contains(t) || inputEl.value?.contains(t) || chevEl.value?.$el.contains(t)) return
   close()
 }
 function onScroll(e: Event) {
@@ -182,27 +183,27 @@ onBeforeUnmount(removeListeners)
       @compositionstart="composing = true"
       @compositionend="onCompositionEnd"
     />
-    <button ref="chevEl" type="button" class="absolute right-0.5 bottom-0.5 grid size-10 cursor-pointer place-items-center rounded-[5px] border-0 bg-transparent p-0 text-muted hover:bg-bg hover:text-ink" tabindex="-1" aria-label="開啟地點清單" title="地點清單" @click="toggle">
+    <li-button variant="plain" ref="chevEl" type="button" class="absolute right-0.5 bottom-0.5 grid size-10 cursor-pointer place-items-center rounded-[5px] border-0 bg-transparent p-0 text-muted hover:bg-bg hover:text-ink" tabindex="-1" aria-label="開啟地點清單" title="地點清單" @click="toggle">
       <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M5.5 8l4.5 4.5L14.5 8" />
       </svg>
-    </button>
+    </li-button>
 
     <!-- 放到 body，避免被列的邊界或拖曳動畫切到 -->
     <Teleport to="body">
       <div v-if="open" ref="menuEl" class="location-menu fixed z-30 overflow-y-auto rounded-lg border border-line-strong bg-surface p-1 shadow-panel" role="listbox" aria-label="館藏地點清單" :style="menuStyle" @mousedown.prevent>
         <div v-for="(o, i) in shown" :key="o" class="flex items-center">
-          <button type="button" class="min-w-0 flex-1 cursor-pointer rounded-[5px] border-0 bg-transparent px-2.5 py-[9px] text-left font-body text-[15px] leading-[1.4] text-ink wrap-anywhere hover:bg-accent-soft [&.on]:bg-accent-soft" role="option" :aria-selected="o === typed" :class="{ on: active === i, 'text-accent! font-bold': o === typed }" @click="pick(o)">
+          <li-button variant="plain" type="button" class="min-w-0 flex-1 cursor-pointer rounded-[5px] border-0 bg-transparent px-2.5 py-[9px] text-left font-body text-[15px] leading-[1.4] text-ink wrap-anywhere hover:bg-accent-soft [&.on]:bg-accent-soft" role="option" :aria-selected="o === typed" :class="{ on: active === i, 'text-accent! font-bold': o === typed }" @click="pick(o)">
             {{ o }}
-          </button>
-          <button type="button" class="size-8 flex-none cursor-pointer rounded-[5px] border-0 bg-transparent text-lg leading-none text-muted hover:bg-danger-soft hover:text-danger" :aria-label="`從清單移除 ${o}`" title="從清單移除" @click="emit('remove', o)">×</button>
+          </li-button>
+          <li-button variant="plain" type="button" class="size-8 flex-none cursor-pointer rounded-[5px] border-0 bg-transparent text-lg leading-none text-muted hover:bg-danger-soft hover:text-danger" :aria-label="`從清單移除 ${o}`" title="從清單移除" @click="emit('remove', o)">×</li-button>
         </div>
         <p v-if="!shown.length && !addable" class="m-0 p-2.5 text-[13px] text-muted">
           {{ options.length ? '沒有符合的地點' : '清單還是空的。在欄位輸入地點後，可以加入清單。' }}
         </p>
-        <button v-if="addable" type="button" class="mt-1 block w-full cursor-pointer rounded-b-[5px] border-0 border-t border-line bg-transparent p-2.5 text-left font-body text-sm leading-[1.4] font-medium text-accent wrap-anywhere first:mt-0 first:rounded-[5px] first:border-t-0 hover:bg-accent-soft [&.on]:bg-accent-soft" :class="{ on: active === shown.length }" @click="addCurrent">
+        <li-button variant="plain" v-if="addable" type="button" class="mt-1 block w-full cursor-pointer rounded-b-[5px] border-0 border-t border-line bg-transparent p-2.5 text-left font-body text-sm leading-[1.4] font-medium text-accent wrap-anywhere first:mt-0 first:rounded-[5px] first:border-t-0 hover:bg-accent-soft [&.on]:bg-accent-soft" :class="{ on: active === shown.length }" @click="addCurrent">
           ＋ 將「{{ typed }}」加入清單
-        </button>
+        </li-button>
       </div>
     </Teleport>
   </div>

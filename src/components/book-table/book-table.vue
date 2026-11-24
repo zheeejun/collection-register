@@ -59,29 +59,29 @@
           </td>
           <td>
             <div class="row-actions">
-              <button
+              <li-button variant="plain"
                 v-if="book.status !== 'borrowed'"
                 class="text-button"
                 :disabled="saving"
                 @click="emit('borrow', book)"
               >
                 登記借出
-              </button>
+              </li-button>
               <template v-else>
                 <LiCheckbox class="reservation-toggle" :model-value="!!book.hasReservation" :disabled="saving" :aria-label="`${book.title} 有人預約，不能續借`" label="有人預約" @change="changeReservation(book, $event)" />
-                <button class="text-button" :disabled="saving || !!renewalBlockReason(book)" :title="renewalBlockReason(book) || '從原到期日延長 28 天'" @click="emit('renew', book)">續借 28 天</button>
+                <li-button variant="plain" class="text-button" :disabled="saving || !!renewalBlockReason(book)" :title="renewalBlockReason(book) || '從原到期日延長 28 天'" @click="emit('renew', book)">續借 28 天</li-button>
                 <span class="table-muted">{{ renewalBlockReason(book) || '可續借一次' }}</span>
-                <button class="text-button" :disabled="saving" @click="emit('return', book)">標記歸還</button>
+                <li-button variant="plain" class="text-button" :disabled="saving" @click="emit('return', book)">標記歸還</li-button>
               </template>
-              <button class="text-button" :disabled="saving" @click="emit('edit', book)">編輯</button>
-              <button
+              <li-button variant="plain" class="text-button" :disabled="saving" @click="emit('edit', book)">編輯</li-button>
+              <li-button variant="plain"
                 class="text-button danger-text"
                 :disabled="saving"
                 :aria-label="`刪除 ${book.title}`"
                 @click="emit('delete', book)"
               >
                 刪除
-              </button>
+              </li-button>
             </div>
           </td>
         </tr>

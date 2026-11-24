@@ -1,0 +1,14 @@
+/* Standalone styles; imported by collection-register-standalone.css. */
+@layer components {
+  input[type="text"] {
+    width: 100%; min-width: 0; height: 44px; padding: 0 12px;
+    border: 1px solid var(--line); border-radius: 6px; background: var(--field); color: var(--ink);
+    font: 18px var(--f-body);
+  }
+
+  input[type="text"]::placeholder { color: var(--muted); opacity: .7; }
+
+  input[type="text"]:hover { border-color: var(--line-strong); }
+
+  input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+}

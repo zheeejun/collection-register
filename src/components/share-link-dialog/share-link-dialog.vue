@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import AppButton from './appbutton/appbutton.vue'
+import { LiButton } from '../../li-components'
 
 const props = defineProps<{ url: string }>()
 const emit = defineEmits<{ (event: 'close'): void }>()
@@ -33,9 +33,9 @@ async function copy() {
     <input id="share-url" ref="input" type="text" :value="url" readonly @focus="input?.select()" />
     <p v-if="message" role="status" class="text-sm text-accent">{{ message }}</p>
     <div class="flex flex-wrap items-center gap-3">
-      <AppButton variant="primary" @click="copy">複製網址</AppButton>
+      <li-button variant="primary" @click="copy">複製網址</li-button>
       <a :href="url" target="_blank" rel="noopener noreferrer" class="text-sm text-accent underline">開啟分享頁</a>
-      <AppButton class="ml-auto" @click="dialog?.close()">關閉</AppButton>
+      <li-button class="ml-auto" @click="dialog?.close()">關閉</li-button>
     </div>
   </dialog>
 </template>

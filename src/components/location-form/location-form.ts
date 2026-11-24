@@ -3,7 +3,7 @@ import type { PropType } from 'vue'
 
 import type { LibraryLocation } from '../../library'
 import type { LocationFormProps } from './location-form.interface'
-import { LiForm, LiFormField, LiInput, LiTextarea } from '../index'
+import { LiForm, LiFormField, LiInput, LiTextarea } from '../../li-components'
 
 export default defineComponent({
   name: 'LocationForm',

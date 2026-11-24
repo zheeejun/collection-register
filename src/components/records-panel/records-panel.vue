@@ -12,14 +12,14 @@
           {{ page === 'locations' ? '新增的地點會保存至資料庫，供所有圖書選用。' : page === 'borrowed' ? '依到期日排序，最先到期的圖書排在前面。' : '整理每一本書，也整理下一段閱讀時光。' }}
         </p>
       </div>
-      <button
+      <li-button variant="plain"
         class="primary-button"
         :disabled="loading || saving || !!fatalError"
         @click="page === 'locations' ? emit('add-location') : emit('add-book')"
       >
         ＋
         {{ page === 'locations' ? '新增地點' : page === 'reserved' ? '新增預約' : page === 'borrowed' ? '新增借書' : '新增圖書' }}
-      </button>
+      </li-button>
     </div>
     <div class="filters">
       <label class="search-field">
@@ -56,7 +56,7 @@
           <span class="empty-symbol" aria-hidden="true">⌂</span>
           <h3>{{ query ? '找不到符合的地點' : '為你的圖書，建立第一個地點' }}</h3>
           <p>{{ query ? '試試其他關鍵字。' : '新增分館、樓層與書架位置，下次就能快速找到書。' }}</p>
-          <button v-if="!query" class="secondary-button" @click="emit('add-location')">＋ 新增館藏地點</button>
+          <li-button variant="plain" v-if="!query" class="secondary-button" @click="emit('add-location')">＋ 新增館藏地點</li-button>
         </div>
       </template>
       <template v-else>
@@ -82,14 +82,14 @@
           <p>
             {{ query || locationFilter || dueFilter !== 'all' ? '調整搜尋或篩選條件，再試一次。' : '新增圖書，記錄館藏地點與閱讀狀態。' }}
           </p>
-          <button
+          <li-button variant="plain"
             v-if="!query && !locationFilter && dueFilter === 'all'"
             class="secondary-button"
             @click="emit('add-book')"
           >
             ＋
             {{ page === 'reserved' ? '新增預約' : page === 'borrowed' ? '新增借書' : '新增圖書' }}
-          </button>
+          </li-button>
         </div>
       </template>
     </template>
@@ -98,14 +98,14 @@
         {{ page === 'locations' ? filteredLocations.length : filteredBooks.length }}
         筆顯示結果
       </span>
-      <button
+      <li-button variant="plain"
         v-if="page !== 'locations'"
         class="text-button"
         :disabled="loading || sharing || !filteredBooks.length || !!fatalError"
         @click="emit('share')"
       >
         {{ sharing ? '產生連結中…' : '分享目前清單 ↗' }}
-      </button>
+      </li-button>
       <span>一點整理，讓閱讀更自在。</span>
     </footer>
   </section>

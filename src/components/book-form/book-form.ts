@@ -3,7 +3,7 @@ import type { PropType } from 'vue'
 import { addLoanDays, LOAN_DAYS, statusLabels } from '../../library'
 import type { Book } from '../../library'
 import type { BookFormProps } from './book-form.interface'
-import { LiCheckbox, LiForm, LiFormField, LiInput, LiSelect, LiTextarea } from '../index'
+import { LiCheckbox, LiForm, LiFormField, LiInput, LiSelect, LiTextarea } from '../../li-components'
 
 export default defineComponent({
   name: 'BookForm',

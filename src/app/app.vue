@@ -13,7 +13,7 @@
         <div class="account-actions">
           <span v-if="userId">{{ email }}</span>
           <span v-else>本機模式 · 尚未啟用跨裝置同步</span>
-          <button v-if="userId" class="text-button" :disabled="saving" @click="signOut">登出</button>
+          <li-button variant="plain" v-if="userId" class="text-button" :disabled="saving" @click="signOut">登出</li-button>
           <time :datetime="today">{{ today.replaceAll('-', ' / ') }}</time>
         </div>
       </div>
@@ -24,8 +24,8 @@
           <p>{{ currentPage.description }}</p>
         </div>
         <div class="library-actions">
-          <button class="secondary-button" :disabled="loading || saving" @click="refreshLibrary">重新讀取</button>
-          <button class="secondary-button" :disabled="loading || !!fatalError" @click="exportData">匯出備份 ↗</button>
+          <li-button variant="plain" class="secondary-button" :disabled="loading || saving" @click="refreshLibrary">重新讀取</li-button>
+          <li-button variant="plain" class="secondary-button" :disabled="loading || !!fatalError" @click="exportData">匯出備份 ↗</li-button>
         </div>
       </header>
       <LibraryStats :counts="counts" :overdue="overdue.length" :soon="soon.length" />
@@ -39,11 +39,11 @@
         <p v-if="importWarning" role="alert">{{ importWarning }}</p>
         <p v-if="data.books.length || data.locations.length">此帳號已有館藏，無法匯入。原始資料仍保留。</p>
         <div class="library-actions">
-          <button v-if="importCandidate" class="primary-button" :disabled="saving || conflict || !!data.books.length || !!data.locations.length" @click="importLibrary">確認這是我的資料，搬入此帳號</button>
+          <li-button variant="plain" v-if="importCandidate" class="primary-button" :disabled="saving || conflict || !!data.books.length || !!data.locations.length" @click="importLibrary">確認這是我的資料，搬入此帳號</li-button>
           <label v-if="!data.books.length && !data.locations.length" class="backup-label">選擇 JSON 備份
             <input type="file" accept=".json,application/json" :disabled="saving" @change="selectBackup" />
           </label>
-          <button v-if="importCandidate || importWarning" class="secondary-button" :disabled="saving" @click="dismissImport">暫不搬移</button>
+          <li-button variant="plain" v-if="importCandidate || importWarning" class="secondary-button" :disabled="saving" @click="dismissImport">暫不搬移</li-button>
         </div>
       </section>
       <div v-if="pendingDelete" class="delete-confirm" role="alert">
@@ -52,8 +52,8 @@
           {{ pendingDelete.label || '未命名圖書' }}
           」？
         </p>
-        <button class="danger-button" :disabled="saving" @click="confirmDelete">確認刪除</button>
-        <button class="secondary-button" :disabled="saving" @click="pendingDelete = null">取消</button>
+        <li-button variant="plain" class="danger-button" :disabled="saving" @click="confirmDelete">確認刪除</li-button>
+        <li-button variant="plain" class="secondary-button" :disabled="saving" @click="pendingDelete = null">取消</li-button>
       </div>
       <BookForm
         v-if="editor === 'book'"

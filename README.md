@@ -85,10 +85,12 @@ src/
     library-db.ts           # IndexedDB 存取
 ```
 
-各元件透過 `<script lang="ts" src="./元件.ts">` 和 `<style scoped src="./元件.css">` 載入同資料夾檔案。表單使用本機草稿，送出後由應用層驗證並儲存，不直接修改館藏紀錄。原有的分享及舊版登記元件沿用原本結構，`AppButton` 已移到 `components/appbutton/`。
+各元件透過 `<script lang="ts" src="./元件.ts">` 和 `<style scoped src="./元件.css">` 載入同資料夾檔案。表單使用本機草稿，送出後由應用層驗證並儲存，不直接修改館藏紀錄。原有的分享及舊版登記元件沿用原本結構。共用 `Li*` 元件位於 `src/li-components/`，透過 `src/li-components/index.ts` 匯出；`LiButton` 的樣式使用 template 中的 Tailwind classes。
 
-共用表單控制項可從 `src/components/index.ts` 匯入，例如 `import { LiCheckbox, LiForm, LiInput } from '../index'`。`LiInput`、`LiSelect`、`LiTextarea` 使用字串 `v-model`；`LiCheckbox` 使用布林值 `v-model`，並將 `disabled`、`required`、`name`、`id`、`aria-*` 等屬性傳給原生 input，`class` 與 `style` 則套用在外層 label。圖書與地點表單共用 `LiForm` 與 `LiFormField`，借閱規則與資料儲存仍由原有 composables 處理。
+共用表單控制項可從 `src/li-components/index.ts` 匯入，例如 `import { LiCheckbox, LiForm, LiInput } from '../../li-components'`。`LiInput`、`LiSelect`、`LiTextarea` 使用字串 `v-model`；`LiCheckbox` 使用布林值 `v-model`，並將 `disabled`、`required`、`name`、`id`、`aria-*` 等屬性傳給原生 input，`class` 與 `style` 則套用在外層 label。圖書與地點表單共用 `LiForm` 與 `LiFormField`，借閱規則與資料儲存仍由原有 composables 處理。
 
 推送到 `main` 會由 GitHub Actions 部署到 https://zheeejun.github.io/collection-register/ （需先在 repo 的 Settings → Pages 將 Source 設為 GitHub Actions）。
 
 `src/collection-register-standalone/` 集中存放舊版獨立登記工具：`collection-register-standalone.html` 負責畫面結構，`collection-register-standalone.js` 包含儲存、圖書列操作、地點選單、拖曳排序、複製與復原，`collection-register-standalone.css` 為樣式來源，`icons/` 存放所需 SVG 圖示。HTML 以一般 script 載入 JS，可直接開啟 HTML；搬移或分享時請保留整個資料夾。可用 `npm run build:standalone` 重新編譯樣式並嵌入 HTML。新版圖書管理請使用 Vite 網站。
+
+Standalone ????????????? `src/li-components/li-*/li-*.standalone.css`?? `collection-register-standalone.css` ?????????????????????????Vue ??????? Tailwind classes ? scoped styles???????? `npm run build:standalone` ???? CSS?

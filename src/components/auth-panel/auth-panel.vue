@@ -16,13 +16,13 @@
         </label>
         <p v-if="error" class="auth-error" role="alert">{{ error }}</p>
         <p v-if="notice" class="auth-notice" role="status">{{ notice }}</p>
-        <button class="auth-primary" type="submit" :disabled="busy">{{ busy ? '處理中…' : recovery ? '儲存新密碼' : mode === 'signup' ? '註冊' : mode === 'reset' ? '寄送重設密碼信' : '登入' }}</button>
+        <li-button variant="plain" class="auth-primary" type="submit" :disabled="busy">{{ busy ? '處理中…' : recovery ? '儲存新密碼' : mode === 'signup' ? '註冊' : mode === 'reset' ? '寄送重設密碼信' : '登入' }}</li-button>
       </form>
       <div v-if="!recovery" class="auth-links">
-        <button type="button" :disabled="busy" @click="changeMode(mode === 'login' ? 'signup' : 'login')">{{ mode === 'login' ? '還沒有帳號？註冊' : '返回登入' }}</button>
-        <button v-if="mode === 'login'" type="button" :disabled="busy" @click="changeMode('reset')">忘記密碼</button>
+        <li-button variant="plain" type="button" :disabled="busy" @click="changeMode(mode === 'login' ? 'signup' : 'login')">{{ mode === 'login' ? '還沒有帳號？註冊' : '返回登入' }}</li-button>
+        <li-button variant="plain" v-if="mode === 'login'" type="button" :disabled="busy" @click="changeMode('reset')">忘記密碼</li-button>
       </div>
-      <button v-else type="button" :disabled="busy" @click="emit('cancel-recovery')">取消並登出</button>
+      <li-button variant="plain" v-else type="button" :disabled="busy" @click="emit('cancel-recovery')">取消並登出</li-button>
       <small class="privacy-note">每位使用者的私人館藏分開儲存。請勿在共用裝置保持登入。</small>
     </section>
   </main>

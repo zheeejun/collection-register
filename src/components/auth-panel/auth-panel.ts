@@ -1,11 +1,11 @@
 import { defineComponent, ref } from 'vue'
 import { authRedirectUrl, supabase } from '../../services/supabase'
-import { LiInput } from '../index'
+import { LiButton, LiInput } from '../../li-components'
 
 type AuthMode = 'login' | 'signup' | 'reset'
 
 export default defineComponent({
-  components: { LiInput },
+  components: { LiButton, LiInput },
   props: { recovery: Boolean },
   emits: ['recovered', 'cancel-recovery'],
   setup(props, { emit }) {

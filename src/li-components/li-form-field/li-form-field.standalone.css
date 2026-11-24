@@ -1,0 +1,10 @@
+/* Standalone styles; imported by collection-register-standalone.css. */
+@layer components {
+  .f { display: block; min-width: 0; }
+
+  .lbl { display: none; margin-bottom: 4px; font-size: 14px; letter-spacing: .04em; color: var(--muted); }
+
+  @media (max-width: 720px) {
+    .lbl { display: block; }
+  }
+}

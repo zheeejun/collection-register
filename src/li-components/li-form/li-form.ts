@@ -1,6 +1,8 @@
+import LiButton from '../li-button/li-button.vue'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
+  components: { LiButton },
   name: 'LiForm',
   props: {
     title: { type: String, required: true },

@@ -1,3 +1,4 @@
+import { LiButton } from '../../li-components'
 import { computed, defineComponent } from 'vue'
 import type { PropType } from 'vue'
 import BookTable from '../book-table/book-table.vue'
@@ -8,7 +9,7 @@ import type { RecordsPanelProps } from './records-panel.interface'
 
 export default defineComponent({
   name: 'RecordsPanel',
-  components: { BookTable, LocationList },
+  components: { LiButton, BookTable, LocationList },
   props: {
     page: { type: String as PropType<RecordsPanelProps['page']>, required: true },
     filteredBooks: { type: Array as PropType<Book[]>, required: true },

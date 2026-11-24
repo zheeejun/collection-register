@@ -143,9 +143,9 @@
     locMenu.replaceChildren();
     items.forEach(function (v) {
       var d = document.createElement('div'); d.className = 'mi';
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'pick'; b.setAttribute('role', 'option');
+      var b = document.createElement('li-button'); b.type = 'button'; b.className = 'pick'; b.setAttribute('role', 'option');
       b.dataset.v = v; b.textContent = v; if (v === typed) b.classList.add('cur');
-      var x = document.createElement('button'); x.type = 'button'; x.className = 'rm'; x.dataset.rm = v;
+      var x = document.createElement('li-button'); x.type = 'button'; x.className = 'rm'; x.dataset.rm = v;
       x.setAttribute('aria-label', '從清單移除 ' + v); x.title = '從清單移除'; x.textContent = '×';
       d.appendChild(b); d.appendChild(x); locMenu.appendChild(d);
     });
@@ -155,7 +155,7 @@
       locMenu.appendChild(n);
     }
     if (addable) {
-      var ad = document.createElement('button'); ad.type = 'button'; ad.className = 'addloc';
+      var ad = document.createElement('li-button'); ad.type = 'button'; ad.className = 'addloc';
       ad.textContent = '＋ 將「' + typed + '」加入清單'; locMenu.appendChild(ad);
     }
     menuAct = -1;
@@ -268,7 +268,7 @@
       if (menuFor === inp) closeMenu(); else openMenu(inp, false);
       return;
     }
-    var b = e.target.closest('button[data-act]');
+    var b = e.target.closest('li-button[data-act]');
     if (!b) return;
     var id = b.closest('.row').dataset.id;
     if (b.dataset.act === 'dup') dup(id); else del(id);
