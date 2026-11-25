@@ -5,6 +5,6 @@ defineProps<{ danger?: boolean }>()
 </script>
 
 <template>
-  <li-button variant="plain" type="button" class="grid size-10 cursor-pointer place-items-center rounded-md border-0 bg-transparent p-0 text-muted"
-    :class="danger ? 'hover:bg-danger-soft hover:text-danger' : 'hover:bg-bg hover:text-ink'"><slot /></li-button>
+  <li-button variant="plain" type="button" class="grid size-10 cursor-pointer place-items-center rounded-md border-0 bg-transparent p-0 text-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
+    :class="danger ? 'hover:bg-red-50 hover:text-red-600' : 'hover:bg-gray-100 hover:text-gray-900'"><slot /></li-button>
 </template>

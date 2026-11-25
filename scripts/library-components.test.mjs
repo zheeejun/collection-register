@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict'
+import { createRequire } from 'node:module'
 import { readFile } from 'node:fs/promises'
 import { after, test } from 'node:test'
+import { compileScript, parse } from '@vue/compiler-sfc'
+import ts from 'typescript'
 import { createRenderer, createSSRApp, h, nextTick, ref, toRaw } from 'vue'
 import { renderToString } from '@vue/server-renderer'
 import { createServer } from 'vite'
@@ -193,7 +196,7 @@ test('shared controls forward native form attributes and render through their pu
   assert.match(html, /<input\b(?=[^>]*name="date")(?=[^>]*required)(?=[^>]*readonly)[^>]*>/)
   assert.match(html, /<select\b(?=[^>]*name="place")(?=[^>]*required)[^>]*>/)
   assert.match(html, /<textarea\b[^>]*name="notes"[^>]*>Notes<\/textarea>/)
-  assert.match(html, /<label\b[^>]*class="li-checkbox full-width"/)
+  assert.match(html, /<label\b(?=[^>]*class="[^"]*\bli-checkbox\b)(?=[^>]*class="[^"]*\bfull-width\b)[^>]*>/)
   assert.match(html, /<input\b(?=[^>]*id="reservation")(?=[^>]*disabled)(?=[^>]*aria-label="Reserved")(?=[^>]*checked)[^>]*>/)
   assert.match(html, /<button type="submit"[^>]*disabled/)
 })
@@ -213,12 +216,16 @@ test('shared feedback, icon buttons and icons render from the common entry point
 })
 
 test('shared checkbox follows parent updates and rolls back a change the parent does not accept', async () => {
-  const { default: checkbox } = await server.ssrLoadModule('/src/li-components/li-checkbox/li-checkbox.ts')
-  const { compile } = await import('@vue/compiler-dom')
   const source = await readFile(new URL('../src/li-components/li-checkbox/li-checkbox.vue', import.meta.url), 'utf8')
-  const template = source.match(/<template>([\s\S]*?)<\/template>/)[1]
-  const render = new Function('Vue', compile(template, { mode: 'function', prefixIdentifiers: true }).code)(await import('vue'))
-  const LiCheckbox = { ...checkbox, render }
+  const { descriptor } = parse(source, { filename: 'li-checkbox.vue' })
+  const compiled = compileScript(descriptor, { id: 'li-checkbox-test', inlineTemplate: true }).content
+  const { outputText } = ts.transpileModule(compiled, {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ESNext },
+    fileName: 'li-checkbox.vue.ts',
+  })
+  const componentModule = { exports: {} }
+  new Function('require', 'module', 'exports', outputText)(createRequire(import.meta.url), componentModule, componentModule.exports)
+  const LiCheckbox = componentModule.exports.default
   const host = createRenderer({
     createElement: tag => ({ tag, children: [], props: {} }),
     createText: text => ({ text }), createComment: text => ({ text }),

@@ -1,11 +1,4 @@
 @import "tailwindcss" source(none);
-@import "../li-components/li-button/li-button.standalone.css";
-@import "../li-components/li-checkbox/li-checkbox.standalone.css";
-@import "../li-components/li-form-field/li-form-field.standalone.css";
-@import "../li-components/li-input/li-input.standalone.css";
-@import "../li-components/li-icon-button/li-icon-button.standalone.css";
-@import "../li-components/li-textarea/li-textarea.standalone.css";
-@import "../li-components/li-toast/li-toast.standalone.css";
 
 @source "./collection-register-standalone.html";
 @source "./collection-register-standalone.js";

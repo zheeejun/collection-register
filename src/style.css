@@ -1,7 +1,4 @@
-@import "tailwindcss" source("./components");
-@source "./li-components";
-@source "./App.vue";
-@source "./app";
+@import "tailwindcss";
 
 @theme inline {
   --color-bg: var(--bg);
